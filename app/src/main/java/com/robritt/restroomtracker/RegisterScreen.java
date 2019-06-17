@@ -1,7 +1,6 @@
 package com.robritt.restroomtracker;
 
 import android.content.Intent;
-import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,25 +31,17 @@ public class RegisterScreen extends AppCompatActivity {
         mEmailField = (EditText) findViewById(R.id.register_email_field);
         mPasswordField = (EditText) findViewById(R.id.register_password_field);
         mConfPasswordField = (EditText) findViewById(R.id.register_passconf_field);
-
-        final Button signupButton = (Button) findViewById(R.id.signup_button);
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startSignUp();
-            }
-        });
     }
 
     @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
 //        updateUI(currentUser); //TODO changes based on if a user is logged in (sign out button)
     }
 
-    private void startSignUp() {
+    public void startSignUp(final View view) {
 
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
@@ -69,7 +60,7 @@ public class RegisterScreen extends AppCompatActivity {
                     if (task.isSuccessful()) { //if signup successful
                         Log.d("USER REGISTER", "createUserWithEmail:success");
                         FirebaseUser user = mAuth.getCurrentUser();
-                        updateUI(user);
+                        updateUI(view,user);
 
 
                     } else { //if signup fails
@@ -83,15 +74,19 @@ public class RegisterScreen extends AppCompatActivity {
         }
     }
 
-    private void updateUI(FirebaseUser user){
+    private void updateUI(View view,FirebaseUser user){
         if(user != null){ //user is signed in
-            Intent intent = new Intent(this, MainMap.class);
-            startActivity(intent);
+            openMap(view);
         }
         else{
             //user has not signed in to the app, no redirect
         }
 
+    }
+
+    public void openMap(View view) { //Change later for validating login, this is just for testing purposes
+        Intent intent = new Intent(this, MainMap.class);
+        startActivity(intent);
     }
 
 

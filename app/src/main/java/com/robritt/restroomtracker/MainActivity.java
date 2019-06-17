@@ -21,14 +21,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Button registerButton = (Button) findViewById(R.id.welcome_register_button);
-        registerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,RegisterScreen.class));
-            }
-        });
-
 //        mAuthListener = new FirebaseAuth.AuthStateListener() { //TODO is this needed?
 //            @Override
 //            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -38,11 +30,9 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        };
 
-
-
     }
     @Override
-    public void onStart() { //checks to see if the user is logged in, if he is take him to map
+    public void onStart() { //set UI based on logged in user
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -59,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intentRegister);
     }
 
-    private void updateUI(FirebaseUser user){
+    private void updateUI(FirebaseUser user){//checks to see if the user is logged in, if he is take him to map
         if(user != null){ //user is signed in
             Intent intent = new Intent(this, MainMap.class);
             startActivity(intent);

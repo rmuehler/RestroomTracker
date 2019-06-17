@@ -1,9 +1,10 @@
 <resources>
     <string name="app_name">Restroom Tracker</string>
     <string name="login_button_text">Login</string>
+    <string name="sign_off_button_text">LOGOUT</string>
     <string name="forgot_password_text">Forgot Password</string>
     <string name="register_button_text">Register</string>
-    <string name="username_hint">USERNAME</string>
+    <string name="username_hint">EMAIL</string>
     <string name="password_hint">PASSWORD</string>
     <string name="confirm_password_hint">CONFIRM PASSWORD</string>
     <string name="email_hint">EMAIL ADDRESS</string>
@@ -23,4 +24,7 @@
     <string name="Restroom">Restroom</string>
 
     <string name="add">ADD</string>
+    <string name="delete_button_text">Delete Account</string>
+    <string name="email_placeholder">example@example.com</string>
+    <string name="account_textview_text">ACCOUNT:</string>
 </resources>
