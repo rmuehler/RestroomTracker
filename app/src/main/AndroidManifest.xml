@@ -15,7 +15,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SettingsScreen"></activity>
+        <activity android:name=".FilterScreen"></activity>
+        <activity android:name=".ArScreen" />
+        <activity android:name=".SettingsScreen" />
         <activity android:name=".AddARestroomScreen" />
         <activity android:name=".RestroomReportingScreen" />
         <activity android:name=".RestroomViewScreen" />
