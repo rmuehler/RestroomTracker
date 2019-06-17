@@ -41,7 +41,7 @@ public class RegisterScreen extends AppCompatActivity {
 //        updateUI(currentUser); //TODO changes based on if a user is logged in (sign out button)
     }
 
-    public void startSignUp(final View view) {
+    public void startSignUp(final View view) { //TODO anonymous users transfer data https://firebase.google.com/docs/auth/android/anonymous-auth
 
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
@@ -58,13 +58,13 @@ public class RegisterScreen extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if (task.isSuccessful()) { //if signup successful
-                        Log.d("USER REGISTER", "createUserWithEmail:success");
+                        Log.d("ACCOUNT", "createUserWithEmail:success");
                         FirebaseUser user = mAuth.getCurrentUser();
                         updateUI(view,user);
 
 
                     } else { //if signup fails
-                        Log.w("USER REGISTER", "createUserWithEmail:failure", task.getException());
+                        Log.w("ACCOUNT", "createUserWithEmail:failure", task.getException());
                         Toast.makeText(RegisterScreen.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     }
 
