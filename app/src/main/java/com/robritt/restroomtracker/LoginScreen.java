@@ -50,13 +50,13 @@ public class LoginScreen extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
 
                     if (task.isSuccessful()) { //if signup successful
-                        Log.d("USER LOGIN", "loginUserWithEmail:success");
+                        Log.d("ACCOUNT", "loginUserWithEmail:success");
                         FirebaseUser user = mAuth.getCurrentUser();
                         updateUI(view,user);
 
 
                     } else { //if signup fails
-                        Log.w("USER LOGIN", "loginUserWithEmail:failure", task.getException());
+                        Log.w("ACCOUNT", "loginUserWithEmail:failure", task.getException());
                         Toast.makeText(LoginScreen.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     }
 
