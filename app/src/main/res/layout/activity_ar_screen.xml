@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingsScreen">
+    tools:context=".ArScreen">
 
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="114dp"
-        android:layout_height="31dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/title_settings"
+        android:id="@+id/textView6"
+        android:layout_width="78dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="52dp"
+        android:text="@string/ar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.115"
+        app:layout_constraintHorizontal_bias="0.486"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>
