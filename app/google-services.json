@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "241092095342",
+    "firebase_url": "https://responsive-ray-243701.firebaseio.com",
+    "project_id": "responsive-ray-243701",
+    "storage_bucket": "responsive-ray-243701.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:241092095342:android:882799dde666dc9e",
+        "android_client_info": {
+          "package_name": "com.robritt.restroomtracker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "241092095342-6lpbs5ujffv0i3dr7m03a7ckll99svu4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSk4UCWQHoYtkZmQQgiB3QSf_sk1pI46w"
+        },
+        {
+          "current_key": "AIzaSyBekX_1HWwQSc83FYwEIGTxEzD3NkyERik"
+        },
+        {
+          "current_key": "AIzaSyAuICrQAxj7CFx2rer-oAtX67Y0DvvNkbU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "241092095342-6lpbs5ujffv0i3dr7m03a7ckll99svu4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

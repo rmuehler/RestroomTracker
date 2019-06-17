@@ -6,7 +6,7 @@
     <string name="username_hint">USERNAME</string>
     <string name="password_hint">PASSWORD</string>
     <string name="confirm_password_hint">CONFIRM PASSWORD</string>
-    <string name="email_hint">VALID EMAIL ADDRESS</string>
+    <string name="email_hint">EMAIL ADDRESS</string>
     <string name="continue_as_guest_text">Continue as Guest</string>
     <string name="logo_description">Logo</string>
     <string name="title_activity_main_map">Map</string>
