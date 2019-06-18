@@ -66,6 +66,22 @@ public class LoginScreen extends AppCompatActivity {
         }
     }
 
+    public void startForgotPassword(View view){
+        String email = mEmailField.getText().toString();
+        mAuth.sendPasswordResetEmail(email).addOnCompleteListener(this, new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    Log.d("ACCOUNT", "passwordResetEmail:sent");
+                    Toast.makeText(LoginScreen.this, "Reset email sent.", Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(LoginScreen.this, "Reset failed.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     private void updateUI(View view,FirebaseUser user) {//checks to see if the user is logged in, if he is take him to map
         if (user != null) { //user is signed in
             openMap(view);
