@@ -19,7 +19,7 @@ import com.google.firebase.auth.*;
 public class RegisterScreen extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
-    private EditText mEmailField, mPasswordField, mConfPasswordField;
+    private EditText mEmailField, mPasswordField, mConfPasswordField, mUsernameField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +29,7 @@ public class RegisterScreen extends AppCompatActivity {
         setContentView(R.layout.activity_register_screen);
 
         mEmailField = (EditText) findViewById(R.id.register_email_field);
+        mUsernameField = (EditText) findViewById(R.id.register_username_field);
         mPasswordField = (EditText) findViewById(R.id.register_password_field);
         mConfPasswordField = (EditText) findViewById(R.id.register_passconf_field);
     }
@@ -44,10 +45,11 @@ public class RegisterScreen extends AppCompatActivity {
     public void startSignUp(final View view) { //TODO anonymous users transfer data https://firebase.google.com/docs/auth/android/anonymous-auth
 
         String email = mEmailField.getText().toString();
+        String username = mUsernameField.getText().toString();
         String password = mPasswordField.getText().toString();
         String confPassword = mConfPasswordField.getText().toString();
 
-        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) { //if no email or password provided
+        if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(username)) { //if no email or password provided
             Toast.makeText(RegisterScreen.this, "Please complete all fields.", Toast.LENGTH_LONG).show();
         } else if (!password.equals(confPassword)) {
             Toast.makeText(RegisterScreen.this, "Password fields do not match.", Toast.LENGTH_LONG).show();
