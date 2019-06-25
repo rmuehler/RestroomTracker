@@ -54,7 +54,7 @@ public class RegisterScreen extends AppCompatActivity {
 //        updateUI(currentUser); //TODO changes based on if a user is logged in (sign out button)
     }
 
-    public void startSignUp(final View view) { //TODO anonymous users transfer data https://firebase.google.com/docs/auth/android/anonymous-auth
+    public void startSignUp(final View view) {
 
         final String email = mEmailField.getText().toString();
         final String username = mUsernameField.getText().toString();
@@ -93,21 +93,23 @@ public class RegisterScreen extends AppCompatActivity {
 
                                 if (task.isSuccessful()) { //if signup successful
                                     Log.d("ACCOUNT", "createUserWithEmail:success");
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    userDB.collection("users").add(newUserInformation).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                    final FirebaseUser user = mAuth.getCurrentUser();
+                                    newUserInformation.put("UID", user.getUid());
+                                    userDB.collection("users").document(user.getUid()).set(newUserInformation).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
-                                        public void onSuccess(DocumentReference documentReference) {
-                                            Log.d("ACCOUNT", "Username added with ID: " + documentReference.getId());
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Log.w("ACCOUNT", "Error adding username", e);
-
+                                        public void onComplete(@NonNull Task<Void> task) { //if email signup works, and username signup works
+                                            if (task.isSuccessful()){
+                                                Log.d("ACCOUNT", "registerUsername:success");
+                                                updateUI(view,user);
+                                            }
+                                            else{ //if auth worked but email registration didn't
+                                                Log.w("ACCOUNT", "registerUsername:failure", task.getException());
+                                                Toast.makeText(RegisterScreen.this, "Registration failed.", Toast.LENGTH_SHORT).show();
+                                                user.delete(); //needs username linked to account, so we need to delete auth info
+                                            }
                                         }
                                     });
 
-                                    updateUI(view,user);
 
 
                                 } else { //if signup fails

@@ -14,16 +14,19 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SettingsScreen extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseUser user;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        db = FirebaseFirestore.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_screen);
         TextView accountEmail = (TextView) findViewById(R.id.setttings_email_view);
@@ -55,11 +58,19 @@ public class SettingsScreen extends AppCompatActivity {
     }
 
     public void deleteAccount(View view){
-
+        final String userid = user.getUid();
         user.delete().addOnCompleteListener(this, new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if(task.isSuccessful()){
+                    db.collection("users").document(userid).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()){
+                                Log.d("ACCOUNT", "UsernameDeletion:success");
+                            } //TODO improve this
+                        }
+                    });
                     user = mAuth.getCurrentUser();
                     Log.d("ACCOUNT", "AccountDeletion:success");
                     Toast.makeText(SettingsScreen.this, "Account deleted.", Toast.LENGTH_SHORT).show();
