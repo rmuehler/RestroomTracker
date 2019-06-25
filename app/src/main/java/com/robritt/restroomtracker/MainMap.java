@@ -21,6 +21,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -28,6 +29,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -38,6 +41,9 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
@@ -50,6 +56,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     LatLng currentPosition;
     Marker locationMarker;
     FirebaseFirestore db;
+    private Map<Marker, String> markerToID = new HashMap<>();
 
 
     @Override
@@ -64,7 +71,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        instance = this;
+//        instance = this;
 
         locationCallback = new LocationCallback() {
             @Override
@@ -73,11 +80,12 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
-                    if (locationMarker != null){
+                    if (locationMarker != null) {
                         locationMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
-                    }
-                    else{
-                        locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current location"));
+                    } else {
+                        locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current location").visible(false));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLng(locationMarker.getPosition()));
+                        mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
                     }
 ////                    locationMarker.remove();
 //                    locationMarker.setPosition();
@@ -90,8 +98,6 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
             ;
         };
-
-
 
 
     }
@@ -107,7 +113,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         Intent intent = new Intent(this, AddARestroomScreen.class);
         intent.putExtra("latitude", locationMarker.getPosition().latitude);
         intent.putExtra("longitude", locationMarker.getPosition().longitude);
-        startActivityForResult(intent,1);
+        startActivityForResult(intent, 1);
     }
 
     public void openFavScreen(View view) {
@@ -130,13 +136,56 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         startActivity(intent);
     }
 
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
+        Location myLocation = mMap.getMyLocation();
+
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+//
+                final String restroomID = markerToID.get(marker); //lookup document id (in database) for current marker
+
+                if (restroomID != null) { //if the ID doesn't exist in database (e.g. its a custom marker or current location)
+
+                    DocumentReference docRef = db.collection("restrooms").document(restroomID);
+
+                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                Map<String, Object> restroom = task.getResult().getData();
+                                GeoPoint geopoint = (GeoPoint) restroom.get("location");
+
+                                Intent intent = new Intent(MainMap.this, RestroomViewScreen.class);
+
+                                intent.putExtra("id", restroomID);
+//                                intent.putExtra("latitude", geopoint.getLatitude());
+//                                intent.putExtra("longitude", geopoint.getLongitude());
+//                                intent.putExtra("createdby", (String)restroom.get("createdby"));
+//                                intent.putExtra("time", restroomID);
+
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(MainMap.this, "Restroom no longer exists", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
         updateRestroomLocations();
-        updateLastLocation();
+//        updateLastLocation();
 
         Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
             @Override
@@ -156,6 +205,10 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         }).check();
 
 
+
+
+
+
     }
 
     @Override
@@ -165,8 +218,11 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
-    private void updateRestroomLocations() {
+
+
+    private void updateRestroomLocations() { //get all restrooms in database with the value "open"
         mMap.clear();
+        markerToID.clear();
         restrooms = db.collection("restrooms")
                 .whereEqualTo("open", true)
                 .get()
@@ -181,7 +237,9 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                                 LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
 
 
-                                Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title("Restroom").snippet("Restroom description"));
+                                Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title("Restroom").snippet("Restroom description")
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+                                markerToID.put(marker, document.getId());
                             }
                         }
                     }
@@ -196,7 +254,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
-                    locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current position"));
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current position"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(locationMarker.getPosition()));
                     mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
                 } else {
