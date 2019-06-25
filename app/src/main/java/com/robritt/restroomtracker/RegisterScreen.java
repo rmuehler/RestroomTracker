@@ -12,19 +12,31 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.*;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class RegisterScreen extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore userDB;
     private EditText mEmailField, mPasswordField, mConfPasswordField, mUsernameField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 //        getActionBar().hide();
         mAuth = FirebaseAuth.getInstance();
+        userDB = FirebaseFirestore.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_screen);
 
@@ -44,33 +56,72 @@ public class RegisterScreen extends AppCompatActivity {
 
     public void startSignUp(final View view) { //TODO anonymous users transfer data https://firebase.google.com/docs/auth/android/anonymous-auth
 
-        String email = mEmailField.getText().toString();
-        String username = mUsernameField.getText().toString();
-        String password = mPasswordField.getText().toString();
-        String confPassword = mConfPasswordField.getText().toString();
+        final String email = mEmailField.getText().toString();
+        final String username = mUsernameField.getText().toString();
+        final String password = mPasswordField.getText().toString();
+        final String confPassword = mConfPasswordField.getText().toString();
+
+        final Map<String,Object> newUserInformation = new HashMap<>();
+        newUserInformation.put("username", username);
+
 
         if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password) || TextUtils.isEmpty(username)) { //if no email or password provided
             Toast.makeText(RegisterScreen.this, "Please complete all fields.", Toast.LENGTH_LONG).show();
         } else if (!password.equals(confPassword)) {
             Toast.makeText(RegisterScreen.this, "Password fields do not match.", Toast.LENGTH_LONG).show();
-        }
-        else {
-            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        }else {
+            Query query = userDB.collection("users").whereEqualTo("username", username);
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                 @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if(task.isSuccessful()){
+                        for(DocumentSnapshot documentSnapshot : task.getResult()){
+                            String foundUser = documentSnapshot.getString("username");
 
-                    if (task.isSuccessful()) { //if signup successful
-                        Log.d("ACCOUNT", "createUserWithEmail:success");
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        updateUI(view,user);
+                            if (foundUser.equals(username)){
+                                Log.d("ACCOUNT", "User Exists");
+                                Toast.makeText(RegisterScreen.this, "Username already exists.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
-
-                    } else { //if signup fails
-                        Log.w("ACCOUNT", "createUserWithEmail:failure", task.getException());
-                        Toast.makeText(RegisterScreen.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     }
 
-                }//end onComplete, when firebase is give the email and password
+                    if (task.getResult().size() == 0){
+                        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                if (task.isSuccessful()) { //if signup successful
+                                    Log.d("ACCOUNT", "createUserWithEmail:success");
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    userDB.collection("users").add(newUserInformation).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                        @Override
+                                        public void onSuccess(DocumentReference documentReference) {
+                                            Log.d("ACCOUNT", "Username added with ID: " + documentReference.getId());
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Log.w("ACCOUNT", "Error adding username", e);
+
+                                        }
+                                    });
+
+                                    updateUI(view,user);
+
+
+                                } else { //if signup fails
+                                    Log.w("ACCOUNT", "createUserWithEmail:failure", task.getException());
+                                    Toast.makeText(RegisterScreen.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                }
+
+                            }//end onComplete, when firebase is give the email and password
+                        });
+
+                    }
+
+
+                }
             });
 
         }
