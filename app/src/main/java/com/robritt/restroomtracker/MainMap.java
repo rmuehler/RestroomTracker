@@ -159,6 +159,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
             @Override
             public void onPermissionGranted(PermissionGrantedResponse response) {
+//                updateLastLocation(); //TODO see if this can be reenabled, since it puts the last known location up on the map INSTANTLY
                 updateLocation();
                 if (ActivityCompat.checkSelfPermission(MainMap.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainMap.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     return;
