@@ -4,8 +4,10 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -29,6 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.ar.core.ArCoreApk;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -45,6 +48,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +64,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     Marker locationMarker;
     FirebaseFirestore db;
     private Map<Marker, String> markerToID = new HashMap<>();
+    FloatingActionButton mArButton;
 
 
     @Override
@@ -67,6 +72,8 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        mArButton = (FloatingActionButton) findViewById(R.id.open_ar_button);
+//        maybeEnableArButton();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         setContentView(R.layout.activity_main_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
@@ -108,6 +115,9 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
     public void openListScreen(View view) {
         Intent intent = new Intent(this, ListOfRestroomsScreen.class);
+//        intent.putExtra("map", (Serializable) markerToID);
+        intent.putExtra("latitude", locationMarker.getPosition().latitude);
+        intent.putExtra("longitude", locationMarker.getPosition().longitude);
         startActivity(intent);
     }
 
@@ -245,7 +255,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         if (doc.getBoolean("open") !=  false) {
                             GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
                             LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title("Restroom").snippet("Restroom description")
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title("Restroom").snippet("Tap for details")
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
                             markerToID.put(marker, doc.getId());
                         }
@@ -310,6 +320,26 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
+    void maybeEnableArButton() {
+        ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(this);
+        if (availability.isTransient()) {
+            // Re-query at 5Hz while compatibility is checked in the background.
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    maybeEnableArButton();
+                }
+            }, 200);
+        }
+        if (availability.isSupported()) {
+//            mArButton.setVisibility(View.VISIBLE);
+            mArButton.setEnabled(false);
+            // indicator on the button.
+        } else { // Unsupported or unknown.
+//            mArButton.setVisibility(View.INVISIBLE);
+            mArButton.setEnabled(false);
+        }
+    }
 
 
 }
