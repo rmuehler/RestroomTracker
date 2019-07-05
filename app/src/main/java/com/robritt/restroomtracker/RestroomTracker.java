@@ -16,3 +16,5 @@ public class RestroomTracker extends Application {
         db = FirebaseFirestore.getInstance();
     }
 }
+
+

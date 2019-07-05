@@ -58,30 +58,20 @@ public class RestroomViewScreen extends AppCompatActivity {
 
 
                     //lookup current user of creator
-                    DocumentReference docRef = db.collection("users").document((String) document.get("createdby"));
-                    docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    db.collection("users").document((String) document.get("createdby")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()){
-
-                                if (task.getResult().getData().get("username") != null){ //TODO this doesnt work when someones accoutn get deleted, crashes
-                                    String createdBy = (String) task.getResult().getData().get("username");
-                                    createdTextView.setText(createdBy);
-                                }
-                                else{
-                                    createdTextView.setText("Guest");
-                                }
-
-
-//                                Toast.makeText(RestroomViewScreen.this, "Tried displaying username", Toast.LENGTH_SHORT);
-
-
+                            if(task.isSuccessful() && task.getResult().getData() != null){
+                                String createdBy = (String) task.getResult().getData().get("username");
+                                createdTextView.setText(createdBy);
                             }
                             else{
-                                createdTextView.setText("Guest");
+                                createdTextView.setText("Deleted user");
                             }
                         }
                     });
+
+
                 }
                 else{
 
