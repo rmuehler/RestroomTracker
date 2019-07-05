@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -31,7 +32,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -219,37 +222,49 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK && requestCode == 1){
-            updateRestroomLocations();
+//            updateRestroomLocations();
         }
     }
 
 
 
     private void updateRestroomLocations() { //get all restrooms in database with the value "open"
-        mMap.clear();
-        markerToID.clear();
-        restrooms = db.collection("restrooms")
-                .whereEqualTo("open", true)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-//                        Log.i("RESTROOMS",document.getData().get("location").toString());
+        db.collection("restrooms")
+            .whereEqualTo("open", true)
+            .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@javax.annotation.Nullable QuerySnapshot queryDocumentSnapshots, @javax.annotation.Nullable FirebaseFirestoreException e) {
+                    if (e != null){
+                        Log.w("Restrooms", "Listen failed", e);
+                        return;
+                    }
+                    mMap.clear();
+                    markerToID.clear();
 
-                                GeoPoint geopoint = (GeoPoint) document.getData().get("location");
-                                LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
-
-
-                                Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title("Restroom").snippet("Restroom description")
-                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
-                                markerToID.put(marker, document.getId());
-                            }
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        if (doc.getBoolean("open") !=  false) {
+                            GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
+                            LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title("Restroom").snippet("Restroom description")
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+                            markerToID.put(marker, doc.getId());
                         }
                     }
+
+
+
+
+
+
+
+
+
+
+
+                    }
                 });
-    }
+
+    } //end restroomlocatiosn
 
     public void updateLastLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
