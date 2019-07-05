@@ -142,11 +142,31 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
         mMap = googleMap;
         mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        mMap.setMyLocationEnabled(true);
-        Location myLocation = mMap.getMyLocation();
+
+        Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
+            @Override
+            public void onPermissionGranted(PermissionGrantedResponse response) {
+                updateLocation();
+                if (ActivityCompat.checkSelfPermission(MainMap.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainMap.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                mMap.setMyLocationEnabled(true);
+            }
+
+            @Override
+            public void onPermissionDenied(PermissionDeniedResponse response) {
+                Toast.makeText(MainMap.this, "Location permission required.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+
+            }
+        }).check();
+
+
+
+//        Location myLocation = mMap.getMyLocation();
 
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -184,28 +204,13 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
             }
         });
 
-        updateRestroomLocations();
+
+
+
+
+
 //        updateLastLocation();
-
-        Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
-            @Override
-            public void onPermissionGranted(PermissionGrantedResponse response) {
-                updateLocation();
-            }
-
-            @Override
-            public void onPermissionDenied(PermissionDeniedResponse response) {
-                Toast.makeText(MainMap.this, "Location permission required.", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-
-            }
-        }).check();
-
-
-
+        updateRestroomLocations();
 
 
 
@@ -248,15 +253,16 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
     public void updateLastLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(MainMap.this, "Location not found.", Toast.LENGTH_SHORT).show();
             return;
         }
         fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
-                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current position"));
+                    mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current position")).setVisible(false);
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(locationMarker.getPosition()));
-                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(10));
                 } else {
                     locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(37.419857, -122.078827)));
                 }

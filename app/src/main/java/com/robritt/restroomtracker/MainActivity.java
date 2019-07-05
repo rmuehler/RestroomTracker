@@ -14,15 +14,21 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseFirestore userDB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mAuth = FirebaseAuth.getInstance();
+        userDB = FirebaseFirestore.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -73,7 +79,18 @@ public class MainActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("ACCOUNT", "signInAnonymously:success");
+                    final Map<String,Object> newUserInformation = new HashMap<>();
                     FirebaseUser user = mAuth.getCurrentUser();
+                    newUserInformation.put("username", "Guest");
+                    newUserInformation.put("UID", user.getUid());
+                    userDB.collection("users").document(user.getUid()).set(newUserInformation).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+
+                            }
+                        }
+                    });
                     updateUI(user);
                 } else {
                     // If sign in fails, display a message to the user.
