@@ -61,16 +61,24 @@ public class RestroomViewScreen extends AppCompatActivity {
                     DocumentReference docRef = db.collection("users").document((String) document.get("createdby"));
                     docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) { //TODO make this far less insecure, as it pulls all the createdby user's data
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                             if (task.isSuccessful()){
-                                String createdBy = (String) task.getResult().getData().get("username"); //TODO this crashes when no createdby is set
-                                createdTextView.setText(createdBy);
+
+                                if (task.getResult().getData().get("username") != null){ //TODO this doesnt work when someones accoutn get deleted, crashes
+                                    String createdBy = (String) task.getResult().getData().get("username");
+                                    createdTextView.setText(createdBy);
+                                }
+                                else{
+                                    createdTextView.setText("Guest");
+                                }
+
+
 //                                Toast.makeText(RestroomViewScreen.this, "Tried displaying username", Toast.LENGTH_SHORT);
 
 
                             }
                             else{
-                                createdTextView.setText("Anonymous");
+                                createdTextView.setText("Guest");
                             }
                         }
                     });
