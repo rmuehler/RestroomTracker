@@ -65,6 +65,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     FirebaseFirestore db;
     private Map<Marker, String> markerToID = new HashMap<>();
     FloatingActionButton mArButton;
+    boolean isFABOpen = false;
 
 
     @Override
@@ -109,7 +110,42 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
             ;
         };
 
+        FloatingActionButton menu_fab = findViewById(R.id.menu_fab);
+        menu_fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!isFABOpen){
+                    showFABMenu();
+                }else{
+                    closeFABMenu();
+                }
+            }
+        });
 
+    }
+
+    private void showFABMenu(){
+        isFABOpen=true;
+        FloatingActionButton fab1 = findViewById(R.id.open_list_button);
+        FloatingActionButton fab2 = findViewById(R.id.open_ar_button);
+        FloatingActionButton fab3 = findViewById(R.id.open_favs_button);
+        FloatingActionButton fab4 = findViewById(R.id.filter_button);
+        fab1.animate().translationY(-getResources().getDimension(R.dimen.standard_60));
+        fab2.animate().translationY(-getResources().getDimension(R.dimen.standard_120));
+        fab3.animate().translationY(-getResources().getDimension(R.dimen.standard_180));
+        fab4.animate().translationY(-getResources().getDimension(R.dimen.standard_240));
+    }
+
+    private void closeFABMenu(){
+        isFABOpen=false;
+        FloatingActionButton fab1 = findViewById(R.id.open_list_button);
+        FloatingActionButton fab2 = findViewById(R.id.open_ar_button);
+        FloatingActionButton fab3 = findViewById(R.id.open_favs_button);
+        FloatingActionButton fab4 = findViewById(R.id.filter_button);
+        fab1.animate().translationY(0);
+        fab2.animate().translationY(0);
+        fab3.animate().translationY(0);
+        fab4.animate().translationY(0);
     }
 
 
@@ -159,6 +195,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
             @Override
             public void onPermissionGranted(PermissionGrantedResponse response) {
+//                updateLastLocation(); //TODO see if this can be reenabled, since it puts the last known location up on the map INSTANTLY
                 updateLocation();
                 if (ActivityCompat.checkSelfPermission(MainMap.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainMap.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     return;
@@ -340,6 +377,10 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
             mArButton.setEnabled(false);
         }
     }
+
+
+
+
 
 
 }

@@ -19,9 +19,12 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.TreeMap;
 
 public class ListOfRestroomsScreen extends AppCompatActivity {
 
@@ -31,6 +34,8 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
     ArrayList<String> listItems;
     ArrayAdapter<String> adapter;
     Map<Long,String> listToID = new HashMap<>();
+    TreeMap<Float, String> distanceID = new TreeMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +56,7 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
         mList.setAdapter(adapter);
 
 
-        updateRestroomsList();
+        updateRestroomsList(25); //TODO allow user to choose how many to display
 
 
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -65,7 +70,7 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                 // Or / And
                 String restroomID = listToID.get(id); //gets restroom DB id from the list ID
                 intent.putExtra("id", restroomID);
-                Toast.makeText(ListOfRestroomsScreen.this, "ID = " + Long.toString(id) + "RID = " + restroomID, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ListOfRestroomsScreen.this, "ID = " + Long.toString(id) + "RID = " + restroomID, Toast.LENGTH_SHORT).show();
 
                 startActivity(intent);
             }
@@ -73,7 +78,8 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
 
     } //end oncreate
 
-    private void updateRestroomsList() { //get all restrooms in database with the value "open"
+    private void updateRestroomsList(final int numberToDisplay) { //get all restrooms in database with the value "open"
+
         db.collection("restrooms")
                 .whereEqualTo("open", true)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -83,7 +89,9 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                             Log.w("Restrooms", "Listen failed", e);
                             return;
                         }
-                        long i = 0;
+                        distanceID.clear();
+                        adapter.clear();
+                        listToID.clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                             if (doc.getBoolean("open") !=  false) {
                                 GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
@@ -94,14 +102,27 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                                 location.setLongitude(longitude);
                                 float distance =  location.distanceTo(currentLocation);
                                 distance = Math.round(distance);
-                                String distanceString = Float.toString(distance);
-                                adapter.add("Restroom\n\tDistance: " + distanceString + " meters");
-                                listToID.put(i,doc.getId());
-                                i++;
+
+
+                                distanceID.put(distance, doc.getId());
 
 
 
                             }
+                            else{
+
+                            }
+                        }//done quering changes in restrooms
+                        long listID = 0;
+                        for (Map.Entry m : distanceID.entrySet()) {
+                            if (listID >= numberToDisplay){
+                                break;
+
+                            }
+                            String distanceString = Float.toString((Float) m.getKey());
+                            adapter.add("Restrooms\n\tDistance " + distanceString + " meters"); //TODO m.getValue() gives us restroomUID, can be used to pull info like tags to display
+                            listToID.put(listID, (String) m.getValue()); //add reference ID when adding stuff to ListView, for lookup in onClickListener
+                            listID++;
                         }
 
 
@@ -118,6 +139,8 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                 });
 
     } //end restroomlocatiosn
+
+
 
 
 } //end class
