@@ -27,4 +27,5 @@
     <string name="delete_button_text">Delete Account</string>
     <string name="email_placeholder">example@example.com</string>
     <string name="account_textview_text">ACCOUNT:</string>
+    <string name="menu">MENU</string>
 </resources>
