@@ -50,7 +50,7 @@
     <string name="leave">Leave Blank</string>
     <string name="upload">Add Photo</string>
     <string name="camera">Take Photo</string>
-
+    <string name="useLocation">Use Location</string>
 
     <string-array name="numStallsArray">
         <item>Leave Blank</item>

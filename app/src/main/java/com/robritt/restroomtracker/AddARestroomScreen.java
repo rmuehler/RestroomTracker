@@ -35,6 +35,16 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
@@ -50,6 +60,12 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.google.firestore.v1.DocumentTransform;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import org.w3c.dom.Text;
 
@@ -61,7 +77,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class AddARestroomScreen extends AppCompatActivity  {
+public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyCallback {
+
+    private GoogleMap miniMap;
 
     FirebaseFirestore db;
     FirebaseAuth mAuth;
@@ -91,6 +109,8 @@ public class AddARestroomScreen extends AppCompatActivity  {
     EditText eDirections ;
     Spinner spStalls;
 
+    LatLng positionOfMarker;
+
 
 
     @Override
@@ -101,6 +121,15 @@ public class AddARestroomScreen extends AppCompatActivity  {
         mStorage = FirebaseStorage.getInstance();
         storageReference = mStorage.getReference();
         setContentView(R.layout.activity_add_arestroom_screen);
+
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.mapView);
+        mapFragment.getMapAsync(this);
+
+
+
+
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
@@ -353,10 +382,8 @@ public class AddARestroomScreen extends AppCompatActivity  {
 
 
 
-
-
-        final double latitude = getIntent().getDoubleExtra("latitude",0);
-        final double longitude = getIntent().getDoubleExtra("longitude", 0);
+        final double latitude = positionOfMarker.latitude;
+        final double longitude = positionOfMarker.longitude;
         GeoPoint geopoint = new GeoPoint(latitude,longitude);
         final Map<String,Object> newRestroom = new HashMap<>();
         final Map<String, Object> cleanlinessRating = new HashMap<>();
@@ -480,5 +507,68 @@ public class AddARestroomScreen extends AppCompatActivity  {
 
 
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        miniMap = googleMap;
+        miniMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+
+        Bundle bundle = getIntent().getExtras();
+        double lat = bundle.getDouble("latitude");
+        double lng = bundle.getDouble("longitude");
+
+        final LatLng lastLocation = new LatLng(lat, lng);
+
+        final Marker locationMarker = miniMap.addMarker(new MarkerOptions()
+                .position(lastLocation)
+                .draggable(true));
+
+        miniMap.moveCamera(CameraUpdateFactory.newLatLng(lastLocation));
+        miniMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+
+        miniMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                locationMarker.setPosition(latLng);
+                miniMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                positionOfMarker = latLng;
+            }
+        });
+
+        miniMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker arg0) {
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public void onMarkerDragEnd(Marker arg0) {
+                Log.d("System out", "onMarkerDragEnd...");
+                miniMap.animateCamera(CameraUpdateFactory.newLatLng(arg0.getPosition()));
+            }
+
+            @Override
+            public void onMarkerDrag(Marker arg0) {
+            }
+        });
+
+        Button btnLoc = (Button) findViewById(R.id.useLocationButton);
+
+        btnLoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                locationMarker.setPosition(lastLocation);
+                miniMap.animateCamera(CameraUpdateFactory.newLatLng(lastLocation));
+                positionOfMarker = lastLocation;
+
+            }
+        });
+
+
+
+    }
+
+
 
 }
