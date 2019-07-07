@@ -49,6 +49,7 @@
     <string name="optional">Optional:</string>
     <string name="leave">Leave Blank</string>
     <string name="upload">Add Photo</string>
+    <string name="camera">Take Photo</string>
 
 
     <string-array name="numStallsArray">
