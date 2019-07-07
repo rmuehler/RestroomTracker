@@ -224,8 +224,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
-                android:secondaryProgressTint="@android:color/transparent"
+                android:progress="2"
                 android:progressTint="#FFC107"
+                android:secondaryProgressTint="@android:color/transparent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/prompt2" />
 
@@ -282,7 +283,7 @@
                 android:text="@string/optional"
                 android:textSize="18sp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvNumStalls" />
+                app:layout_constraintTop_toBottomOf="@+id/eFloor" />
 
             <Spinner
                 android:id="@+id/numStalls"
@@ -369,7 +370,7 @@
             </RadioGroup>
 
             <EditText
-                android:id="@+id/tvNumStalls"
+                android:id="@+id/eFloor"
                 android:layout_width="54dp"
                 android:layout_height="30dp"
                 android:layout_marginStart="12dp"
