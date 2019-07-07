@@ -563,6 +563,9 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
             public void onMarkerDragEnd(Marker arg0) {
                 Log.d("System out", "onMarkerDragEnd...");
                 miniMap.animateCamera(CameraUpdateFactory.newLatLng(arg0.getPosition()));
+                LatLng latLng = arg0.getPosition();
+                locationMarker.setPosition(latLng);
+                positionOfMarker = latLng;
             }
 
             @Override
