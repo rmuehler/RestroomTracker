@@ -51,6 +51,10 @@
     <string name="upload">Add Photo</string>
     <string name="camera">Take Photo</string>
     <string name="useLocation">Use Location</string>
+    <string name="men">Men</string>
+    <string name="women">Women</string>
+    <string name="unisex">Unisex</string>
+    <string name="family">Family</string>
 
     <string-array name="numStallsArray">
         <item>Leave Blank</item>
