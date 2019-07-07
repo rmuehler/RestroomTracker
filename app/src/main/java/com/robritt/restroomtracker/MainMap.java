@@ -292,7 +292,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         if (doc.getBoolean("open") !=  false) {
                             GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
                             LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title("Restroom").snippet("Tap for details")
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title(doc.getString("name")).snippet("Tap for details")
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
                             markerToID.put(marker, doc.getId());
                         }

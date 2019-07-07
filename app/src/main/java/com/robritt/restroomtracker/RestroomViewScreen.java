@@ -39,8 +39,7 @@ public class RestroomViewScreen extends AppCompatActivity {
         final TextView createdTextView = findViewById(R.id.view_createdby);
         final TextView whenTextView = findViewById(R.id.view_createdwhen);
 
-        DocumentReference restRef = db.collection("restrooms").document(getIntent().getStringExtra("id")); //TODO merge oncompletelistener
-
+        DocumentReference restRef = db.collection("restrooms").document(getIntent().getStringExtra("id")); //trying to find the current username of the creator of restroom
         restRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -86,9 +85,7 @@ public class RestroomViewScreen extends AppCompatActivity {
 
     public void openReportScreen(View view){
         Intent intent = new Intent(this, RestroomReportingScreen.class);
-
         intent.putExtra("id", getIntent().getStringExtra("id"));
-
         startActivity(intent);
     }
 }
