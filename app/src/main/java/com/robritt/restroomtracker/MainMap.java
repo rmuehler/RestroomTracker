@@ -49,6 +49,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,6 +67,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 //    private Map<Marker, String> markerToID = new HashMap<>();
     FloatingActionButton mArButton;
     boolean isFABOpen = false;
+    private ArrayList<Marker> mMarkers = new ArrayList<Marker>();
 
 
     @Override
@@ -286,7 +288,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         return;
                     }
                     mMap.clear();
-//                    markerToID.clear();
+                    mMarkers.clear();
 
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         if (doc.getBoolean("open") !=  false) {
@@ -297,9 +299,12 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))); //TODO we can have a custom restroom icon here
 
                             marker.setTag(doc.getId());
-//                            markerToID.put(marker, doc.getId());
+                            mMarkers.add(marker);
                         }
                     }
+
+                    //TODO filter markers based on custom distance filter
+                    // filterRestroooms();
 
                     }
                 });

@@ -28,6 +28,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.SeekBar;
@@ -107,10 +108,12 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
     Switch sHandicap;
     Switch sKey ;
     EditText eFloor;
+    RadioGroup rgGender;
     RadioGroup rgAutomatic ;
     RadioGroup rgBuilding ;
     EditText eDirections ;
     Spinner spStalls;
+    RadioButton rCheckedGender;
 
     LatLng positionOfMarker;
     LatLng lastLocation;
@@ -154,6 +157,7 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         sHandicap = findViewById(R.id.handicapSwitch);
         sKey = findViewById(R.id.keySwitch);
         eFloor = findViewById(R.id.eFloor);
+        rgGender = findViewById(R.id.genderRadioGroup);
         rgAutomatic = findViewById(R.id.radioGroup); //automatic toilets
         rgBuilding = findViewById(R.id.radioGroup2); //inside building?
         eDirections = findViewById(R.id.buildingDescription);
@@ -400,6 +404,13 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
             eFloor.setError("Floor required");
             return;
         }
+        if (rgGender.getCheckedRadioButtonId() == -1){
+            Toast.makeText(this, "Please specify restroom gender", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else{ //get the radio button that is checked
+            rCheckedGender = (RadioButton) findViewById(rgGender.getCheckedRadioButtonId());
+        }
 
 
 
@@ -428,11 +439,11 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
 
         newRestroom.put("floor", eFloor.getText().toString());
 
-
         //DOES NOT NEED VALIDATION
         newRestroom.put("babychanging", sBaby.isChecked());
         newRestroom.put("handicapped", sHandicap.isChecked());
         newRestroom.put("keyrequired", sKey.isChecked());
+        newRestroom.put("gender", rCheckedGender.getText());
 
         cleanlinessRating.put(mAuth.getCurrentUser().getUid(), rCleanliness.getRating()); //we need to store this in maps to the UID is linked to rating
         newRestroom.put("cleanliness", cleanlinessRating);
@@ -441,8 +452,38 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         newRestroom.put("privacy", privacyRating);
 
         //optional stuff
-        newRestroom.put("automatictoilets", rgAutomatic.getCheckedRadioButtonId());
-        newRestroom.put("insidebuilding", rgBuilding.getCheckedRadioButtonId());
+        if (rgAutomatic.getCheckedRadioButtonId() == -1){
+            newRestroom.put("automatictoilets", "Not specified");
+        }
+        else{
+            RadioButton rCheckedAutomatic = (RadioButton) findViewById(rgAutomatic.getCheckedRadioButtonId());
+            if("Leave Blank".equals(rCheckedAutomatic.getText())){
+                newRestroom.put("automatictoilets", "Not specified");
+            }
+            else {
+                newRestroom.put("automatictoilets", rCheckedAutomatic.getText());
+            }
+        }
+        if(rgBuilding.getCheckedRadioButtonId() == -1){
+            newRestroom.put("insidebuilding", "Not specified");
+        }
+        else{
+
+            RadioButton rCheckedBuilding = (RadioButton) findViewById(rgBuilding.getCheckedRadioButtonId());
+            if("Leave Blank".equals(rCheckedBuilding.getText())){
+                newRestroom.put("insidebuilding", "Not specified");
+            }
+            else {
+                newRestroom.put("insidebuilding", rCheckedBuilding.getText());
+            }
+        }
+//        newRestroom.put("automatictoilets", rgAutomatic.getCheckedRadioButtonId());
+//        newRestroom.put("insidebuilding", rgBuilding.getCheckedRadioButtonId());
+
+
+
+
+
         newRestroom.put("directions", eDirections.getText().toString());
         newRestroom.put("stalls", spStalls.getSelectedItem().toString());
 
