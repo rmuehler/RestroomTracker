@@ -298,16 +298,6 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         }
                     }
 
-
-
-
-
-
-
-
-
-
-
                     }
                 });
 
