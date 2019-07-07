@@ -390,11 +390,8 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         final Map<String, Object> privacyRating = new HashMap<>();
 
         //image upload
-
-
-
-
         newRestroom.put("image", uploadImage().getPath());
+
         //required stuff
         newRestroom.put("name", eName.getText().toString());
         newRestroom.put("open", true);

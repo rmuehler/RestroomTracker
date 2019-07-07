@@ -63,7 +63,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     LatLng currentPosition;
     Marker locationMarker;
     FirebaseFirestore db;
-    private Map<Marker, String> markerToID = new HashMap<>();
+//    private Map<Marker, String> markerToID = new HashMap<>();
     FloatingActionButton mArButton;
     boolean isFABOpen = false;
 
@@ -223,8 +223,8 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
             @Override
             public void onInfoWindowClick(Marker marker) {
 //
-                final String restroomID = markerToID.get(marker); //lookup document id (in database) for current marker
-
+//                final String restroomID = markerToID.get(marker); //lookup document id (in database) for current marker
+                final String restroomID =(String) marker.getTag();
                 if (restroomID != null) { //if the ID doesn't exist in database (e.g. its a custom marker or current location)
 
                     DocumentReference docRef = db.collection("restrooms").document(restroomID);
@@ -286,15 +286,18 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         return;
                     }
                     mMap.clear();
-                    markerToID.clear();
+//                    markerToID.clear();
 
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         if (doc.getBoolean("open") !=  false) {
                             GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
                             LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title(doc.getString("name")).snippet("Tap for details")
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
-                            markerToID.put(marker, doc.getId());
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title(doc.getString("name"))
+                                    .snippet((String)doc.getString("directions"))
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))); //TODO we can have a custom restroom icon here
+
+                            marker.setTag(doc.getId());
+//                            markerToID.put(marker, doc.getId());
                         }
                     }
 
