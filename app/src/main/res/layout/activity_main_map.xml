@@ -20,17 +20,17 @@
         android:id="@+id/add_new_marker_button"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_alignTop="@+id/menu_fab"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="25dp"
+        android:layout_alignBottom="@+id/map"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="102dp"
         android:layout_marginBottom="25dp"
+        android:layout_toEndOf="@+id/menu_fab"
         android:clickable="true"
         android:focusable="true"
         android:onClick="openAddScreen"
         android:src="@drawable/ic_add"
-        app:backgroundTint="@color/colorPrimaryDark" />
+        app:backgroundTint="@color/colorPrimaryDark"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/open_list_button"
@@ -109,16 +109,6 @@
         android:src="@drawable/ic_menu"
         app:backgroundTint="@color/colorPrimaryDark" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/menu_fab"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="25dp"
-        android:layout_marginBottom="25dp"
-        android:src="@drawable/ic_menu"
-        app:backgroundTint="#009688" />
 
 
 </RelativeLayout>

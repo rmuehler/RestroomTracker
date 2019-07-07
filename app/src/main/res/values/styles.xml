@@ -7,4 +7,15 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="RadioButtonStyleMen" parent="AppTheme">
+        <item name="colorControlNormal">#3F51B5</item>
+        <item name="colorAccent">#3F51B5</item>
+        <item name="android:textColorSecondary">#000000</item>
+    </style>
+    <style name="RadioButtonStyleWomen" parent="AppTheme">
+        <item name="colorControlNormal">#B53F76</item>
+        <item name="colorAccent">#B53F76</item>
+        <item name="android:textColorSecondary">#000000</item>
+    </style>
 </resources>
