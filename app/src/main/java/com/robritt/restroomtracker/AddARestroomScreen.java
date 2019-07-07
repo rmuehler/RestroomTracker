@@ -7,6 +7,7 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -21,6 +22,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -39,6 +41,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -110,7 +113,7 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
     Spinner spStalls;
 
     LatLng positionOfMarker;
-
+    LatLng lastLocation;
 
 
     @Override
@@ -127,6 +130,11 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
                 .findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
 
+        Bundle bundle = getIntent().getExtras();
+        double lat = bundle.getDouble("latitude");
+        double lng = bundle.getDouble("longitude");
+
+        lastLocation = new LatLng(lat, lng);
 
 
 
@@ -243,6 +251,19 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
 
             }
         });
+
+
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
+            params.height = 400;
+            mapFragment.getView().setLayoutParams(params);
+        } else {
+            ViewGroup.LayoutParams params = mapFragment.getView().getLayoutParams();
+            params.height = 800;
+            mapFragment.getView().setLayoutParams(params);
+        }
 
 
     }
@@ -511,11 +532,7 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         miniMap = googleMap;
         miniMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
-        Bundle bundle = getIntent().getExtras();
-        double lat = bundle.getDouble("latitude");
-        double lng = bundle.getDouble("longitude");
 
-        final LatLng lastLocation = new LatLng(lat, lng);
 
         final Marker locationMarker = miniMap.addMarker(new MarkerOptions()
                 .position(lastLocation)
@@ -543,6 +560,9 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
             public void onMarkerDragEnd(Marker arg0) {
                 Log.d("System out", "onMarkerDragEnd...");
                 miniMap.animateCamera(CameraUpdateFactory.newLatLng(arg0.getPosition()));
+                LatLng latLng = arg0.getPosition();
+                locationMarker.setPosition(latLng);
+                positionOfMarker = latLng;
             }
 
             @Override
@@ -561,7 +581,6 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
 
             }
         });
-
 
 
     }
