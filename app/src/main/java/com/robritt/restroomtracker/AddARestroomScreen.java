@@ -1,11 +1,18 @@
 package com.robritt.restroomtracker;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -44,9 +51,12 @@ public class AddARestroomScreen extends AppCompatActivity  {
     FirebaseAuth mAuth;
 
     private Button btnChoose;
+    private Button btnTake;
     private ImageView imageView;
     private Uri filePath;
     private final int PICK_IMAGE_REQUEST = 71;
+    private final int TAKE_IMAGE_REQUEST = 52;
+    private static final int PERMISSION_REQUEST_CODE = 200;
 
 
 
@@ -131,17 +141,87 @@ public class AddARestroomScreen extends AppCompatActivity  {
         }*/
 
         btnChoose = (Button) findViewById(R.id.uploadButton);
+        btnTake = (Button) findViewById(R.id.takePhotoButton);
         imageView = (ImageView) findViewById(R.id.imgView);
 
         btnChoose.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 chooseImage();
+            }
+        });
+        btnTake.setOnClickListener(new View.OnClickListener() {
+
+
+
+            @Override
+            public void onClick(View view) {
+                if (checkPermission()) {
+                    takeImage();
+                } else {
+                    requestPermission();
+                }
+
             }
         });
 
 
     }
+    private boolean checkPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            return false;
+        }
+        return true;
+    }
+
+    private void requestPermission() {
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.CAMERA},
+                PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getApplicationContext(), "Permission Granted", Toast.LENGTH_SHORT).show();
+
+                    // main logic
+                } else {
+                    Toast.makeText(getApplicationContext(), "Permission Denied", Toast.LENGTH_SHORT).show();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                                != PackageManager.PERMISSION_GRANTED) {
+                            showMessageOKCancel("You need to allow access permissions",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                                requestPermission();
+                                            }
+                                        }
+                                    });
+                        }
+                    }
+                }
+                break;
+        }
+    }
+
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(AddARestroomScreen.this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+
+
 
     private void chooseImage() {
         Intent intent = new Intent();
@@ -149,21 +229,28 @@ public class AddARestroomScreen extends AppCompatActivity  {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
+    private void takeImage() {
+        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(takePicture, TAKE_IMAGE_REQUEST);//zero can be replaced with any action code
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null )
-        {
-            filePath = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                imageView.setImageBitmap(bitmap);
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
+        switch(requestCode) {
+            case 71:
+                if(resultCode == RESULT_OK){
+                    Uri selectedImage = data.getData();
+                    imageView.setImageURI(selectedImage);
+                }
+
+                break;
+            case 52:
+                if(resultCode == RESULT_OK){
+                    Bitmap photo = (Bitmap) data.getExtras().get("data");
+                    imageView.setImageBitmap(photo);
+                }
+                break;
         }
     }
 
