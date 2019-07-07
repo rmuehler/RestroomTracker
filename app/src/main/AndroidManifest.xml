@@ -8,6 +8,8 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 
     <application
@@ -16,14 +18,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:name=".RestroomTracker">
         <meta-data android:name="com.google.ar.core" android:value="optional" />
 
         <activity android:name=".FilterScreen"></activity>
         <activity android:name=".ArScreen" />
         <activity android:name=".SettingsScreen" />
-        <activity android:name=".AddARestroomScreen" />
+        <activity android:name=".AddARestroomScreen" android:windowSoftInputMode="adjustPan" />
         <activity android:name=".RestroomReportingScreen" />
         <activity android:name=".RestroomViewScreen" />
         <activity android:name=".FavoriteRestroomsScreen" />

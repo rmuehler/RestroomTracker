@@ -30,7 +30,7 @@
         android:focusable="true"
         android:onClick="openAddScreen"
         android:src="@drawable/ic_add"
-        app:backgroundTint="#009688" />
+        app:backgroundTint="@color/colorPrimaryDark" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/open_list_button"
@@ -44,7 +44,7 @@
         android:focusable="true"
         android:onClick="openListScreen"
         android:src="@drawable/ic_list"
-        app:backgroundTint="#009688" />
+        app:backgroundTint="@color/colorPrimaryDark" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/open_ar_button"
@@ -58,7 +58,7 @@
         android:focusable="true"
         android:onClick="openARScreen"
         android:src="@drawable/artexticon"
-        app:backgroundTint="#009688" />
+        app:backgroundTint="@color/colorPrimaryDark" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/open_favs_button"
@@ -72,7 +72,7 @@
         android:focusable="true"
         android:onClick="openFavScreen"
         android:src="@drawable/hearticon"
-        app:backgroundTint="#009688" />
+        app:backgroundTint="@color/colorPrimaryDark" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/open_settings_button"
@@ -84,7 +84,7 @@
         android:layout_marginStart="25dp"
         android:onClick="openSettingsScreen"
         android:src="@drawable/ic_settings"
-        app:backgroundTint="#009688" />
+        app:backgroundTint="@color/colorPrimaryDark" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/filter_button"
@@ -96,7 +96,7 @@
         android:layout_marginBottom="25dp"
         android:onClick="openFilterScreen"
         android:src="@drawable/filter"
-        app:backgroundTint="#009688" />
+        app:backgroundTint="@color/colorPrimaryDark" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/menu_fab"
@@ -107,7 +107,7 @@
         android:layout_marginStart="25dp"
         android:layout_marginBottom="25dp"
         android:src="@drawable/ic_menu"
-        app:backgroundTint="#009688" />
+        app:backgroundTint="@color/colorPrimaryDark" />
 
 
 </RelativeLayout>
