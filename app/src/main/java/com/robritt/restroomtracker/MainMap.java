@@ -80,7 +80,6 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         filters = getSharedPreferences("filters", MODE_PRIVATE);
-        mArButton = (FloatingActionButton) findViewById(R.id.open_ar_button);
 //        maybeEnableArButton();
         locationMarker = null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -132,25 +131,22 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     private void showFABMenu(){
         isFABOpen=true;
         FloatingActionButton fab1 = findViewById(R.id.open_list_button);
-        FloatingActionButton fab2 = findViewById(R.id.open_ar_button);
-        FloatingActionButton fab3 = findViewById(R.id.open_favs_button);
-        FloatingActionButton fab4 = findViewById(R.id.filter_button);
+        FloatingActionButton fab2 = findViewById(R.id.open_favs_button);
+        FloatingActionButton fab3 = findViewById(R.id.filter_button);
         fab1.animate().translationY(-getResources().getDimension(R.dimen.standard_60));
         fab2.animate().translationY(-getResources().getDimension(R.dimen.standard_120));
         fab3.animate().translationY(-getResources().getDimension(R.dimen.standard_180));
-        fab4.animate().translationY(-getResources().getDimension(R.dimen.standard_240));
     }
 
     private void closeFABMenu(){
         isFABOpen=false;
         FloatingActionButton fab1 = findViewById(R.id.open_list_button);
-        FloatingActionButton fab2 = findViewById(R.id.open_ar_button);
-        FloatingActionButton fab3 = findViewById(R.id.open_favs_button);
-        FloatingActionButton fab4 = findViewById(R.id.filter_button);
+        FloatingActionButton fab2 = findViewById(R.id.open_favs_button);
+        FloatingActionButton fab3 = findViewById(R.id.filter_button);
         fab1.animate().translationY(0);
         fab2.animate().translationY(0);
         fab3.animate().translationY(0);
-        fab4.animate().translationY(0);
+
     }
 
 
