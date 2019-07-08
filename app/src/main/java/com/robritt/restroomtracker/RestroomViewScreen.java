@@ -1,6 +1,7 @@
 package com.robritt.restroomtracker;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,11 +33,15 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.google.firebase.Timestamp.now;
 
@@ -43,6 +49,8 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
     private GoogleMap miniMap;
     FirebaseFirestore db;
+    FirebaseStorage mStorage;
+    StorageReference storageReference;
 
     ListView listView;
     ArrayList<String> listItems;
@@ -52,6 +60,10 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mStorage = FirebaseStorage.getInstance();
+        storageReference = mStorage.getReference();
+
+
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
         setContentView(R.layout.activity_restroom_view_screen);
@@ -61,17 +73,11 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
         mapFragment.getMapAsync(this);
 
         final TextView longitudeTextView = findViewById(R.id.view_longitude);
-        final TextView createdTextView = findViewById(R.id.view_createdby);
-        final TextView whenTextView = findViewById(R.id.view_createdwhen);
+
         final TextView nameTextView = findViewById(R.id.restroomName);
-        final TextView hoursTextView = findViewById(R.id.hoursDisplay);
-        final TextView cleanTextView = findViewById(R.id.cleanlinessDisplay);
-        final TextView privacyTextView = findViewById(R.id.privacyDisplay);
-        final TextView babyTextView = findViewById(R.id.babyDisplay);
-        final TextView handicapTextView = findViewById(R.id.handicapDisplay);
-        final TextView keyTextView = findViewById(R.id.keyDisplay);
-        final TextView floorTextView = findViewById(R.id.floorDisplay);
         final TextView genderTextView = findViewById(R.id.genderDisplay);
+        final TextView createdBy = findViewById(R.id.createdByDisplay);
+        final TextView createdAt = findViewById(R.id.createdAtDisplay);
 
 
         listView = (ListView) findViewById(R.id.listViewOptional);
@@ -95,45 +101,87 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
                     nameTextView.setText((String)document.get("name"));
 
+
+                    //lookup current user of creator
+                    db.collection("users").document((String) document.get("createdby")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if(task.isSuccessful() && task.getResult().getData() != null){
+                                String createdByText = "Created by: " + (String) task.getResult().getData().get("username");
+                                createdBy.setText(createdByText);
+
+                            }
+                            else{
+                                String createdByText = "Created by: Deleted User";
+                                createdBy.setText(createdByText);
+                            }
+                        }
+                    });
+
+                    Timestamp created = (Timestamp) document.get("created");
+//                    String relativeTime = (String) DateUtils.getRelativeTimeSpanString(created.toDate().getTime(), now().toDate().getTime(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
+                    String relativeTime = (String) DateUtils.getRelativeTimeSpanString(created.toDate().getTime());
+//                    String stringTimeSince = DateUtils.getRelativeTimeSpanString(document.get("created"), FieldValue.serverTimestamp(), DateUtils.MINUTE_IN_MILLIS, document.get("created");
+//                    whenTextView.setText( Integer.toString(now().compareTo(created)));
+
+                    createdAt.setText(relativeTime);
+
+
                     String dbOpen = (String)document.get("opens");
                     String dbClose = (String)document.get("closes");
 
                     if(dbOpen.equals("24 hours")){
-                        hoursTextView.setText("Open 24 Hours");
+                        listItems.add("Open 24 Hours");
+                        adapter.notifyDataSetChanged();
                     }
                     else{
-                        hoursTextView.setText("Open: " + dbOpen + " - " + dbClose);
+                        String a = "Open: " + dbOpen + " - " + dbClose;
+                        listItems.add(a);
+                        adapter.notifyDataSetChanged();
+
                     }
 
                     //Change these to be scores based on averages from reviews
-                    cleanTextView.setText("Cleanliness: " /* + (String)document.get("cleanliness") */);
-                    privacyTextView.setText("Privacy: ");
+                    listItems.add("Cleanliness: ");
+                    adapter.notifyDataSetChanged();
+
+                    listItems.add("Privacy: ");
+                    adapter.notifyDataSetChanged();
 
                     Boolean babyBoolean = (Boolean) document.get("babychanging");
                     if(babyBoolean){
-                        babyTextView.setText("Baby Changing Station Available");
+                        listItems.add("Baby Changing Station Available");
+                        adapter.notifyDataSetChanged();
                     }
                     else{
-                        babyTextView.setText("No Baby Changing Stations");
+                        listItems.add("No Baby Changing Stations");
+                        adapter.notifyDataSetChanged();
+
                     }
 
                     Boolean handicapBoolean = (Boolean) document.get("handicapped");
                     if(handicapBoolean){
-                        handicapTextView.setText("Handicap Accessible");
+                        listItems.add("Handicap Accessible");
+                        adapter.notifyDataSetChanged();
                     }
                     else{
-                        handicapTextView.setText("Not Handicap Accessible");
+                        listItems.add("Not Handicap Accessible");
+                        adapter.notifyDataSetChanged();
                     }
 
                     Boolean keyBoolean = (Boolean)document.get("keyrequired");
                     if(keyBoolean){
-                        keyTextView.setText("Key is Required for Access");
+                        listItems.add("Key is Required for Access");
+                        adapter.notifyDataSetChanged();
                     }
                     else{
-                        keyTextView.setText("No Key Required for Access");
+                        listItems.add("No Key Required for Access");
+                        adapter.notifyDataSetChanged();
                     }
 
-                    floorTextView.setText("Floor: " + (String)document.get("floor"));
+                    String b = "Floor: " + (String)document.get("floor");
+                    listItems.add(b);
+                    adapter.notifyDataSetChanged();
 
 
                     String dbGender = (String)document.get("gender");
@@ -184,32 +232,23 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
                     }
 
 
+                    String dbImage = (String)document.get("image");
+                    ImageView showPhoto = (ImageView) findViewById(R.id.imgView);
 
 
-
-
-                    Timestamp created = (Timestamp) document.get("created");
-//                    String relativeTime = (String) DateUtils.getRelativeTimeSpanString(created.toDate().getTime(), now().toDate().getTime(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
-                    String relativeTime = (String) DateUtils.getRelativeTimeSpanString(created.toDate().getTime());
-//                    String stringTimeSince = DateUtils.getRelativeTimeSpanString(document.get("created"), FieldValue.serverTimestamp(), DateUtils.MINUTE_IN_MILLIS, document.get("created");
-//                    whenTextView.setText( Integer.toString(now().compareTo(created)));
-                    whenTextView.setText(relativeTime);
-
-
-                    //lookup current user of creator
-                    db.collection("users").document((String) document.get("createdby")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    StorageReference storageRef = storageReference.child(dbImage);//reach out to your photo file hierarchically
+                    storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                         @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if(task.isSuccessful() && task.getResult().getData() != null){
-                                String createdBy = (String) task.getResult().getData().get("username");
-                                createdTextView.setText(createdBy);
-                            }
-                            else{
-                                createdTextView.setText("Deleted user");
-                            }
+                        public void onSuccess(Uri uri) {
+                            Log.d("URI", uri.toString()); //check path is correct or not ?
+                            Picasso.with(RestroomViewScreen.this).load(uri.toString()).into(showPhoto);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Handle errors
                         }
                     });
-
 
                 }
                 else{
