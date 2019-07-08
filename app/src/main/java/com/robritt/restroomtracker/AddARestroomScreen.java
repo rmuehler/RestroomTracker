@@ -418,6 +418,7 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         final Map<String,Object> newRestroom = new HashMap<>();
         final Map<String, Object> cleanlinessRating = new HashMap<>();
         final Map<String, Object> privacyRating = new HashMap<>();
+        final Map<String, Object> favorites = new HashMap<>();
 
         //image upload
         newRestroom.put("image", uploadImage().getPath());
@@ -442,6 +443,9 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         newRestroom.put("handicapped", sHandicap.isChecked());
         newRestroom.put("keyrequired", sKey.isChecked());
         newRestroom.put("gender", rCheckedGender.getText().toString());
+
+        favorites.put(mAuth.getCurrentUser().getUid(), true);
+        newRestroom.put("favorites", favorites);
 
         cleanlinessRating.put(mAuth.getCurrentUser().getUid(), rCleanliness.getRating()); //we need to store this in maps to the UID is linked to rating
         newRestroom.put("cleanliness", cleanlinessRating);

@@ -320,7 +320,6 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         //gets the average ratings for each category:
                         Map<String, Object> cleanlinessRatings = (Map) doc.getData().get("cleanliness");
                         Map<String, Object> privacyRatings = (Map) doc.getData().get("privacy");
-
                         double cleanRating = 0;
                         double privacyRating = 0;
 

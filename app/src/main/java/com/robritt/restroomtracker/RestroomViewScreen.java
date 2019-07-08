@@ -1,8 +1,13 @@
 package com.robritt.restroomtracker;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -10,10 +15,14 @@ import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +50,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -58,7 +68,16 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
     ArrayList<String> listItems;
     ArrayAdapter<String> adapter;
 
-    LatLng restroomLocation = new LatLng(0,0);
+    LatLng restroomLocation = new LatLng(0, 0);
+
+    RatingBar cleanliness, privacy;
+    TextView privacyNo, cleanlinessNo, createdBy, createdAt;
+    ImageButton favoriteButton;
+
+    Map<String, Object> userPrivacyRatings;
+    Map<String, Object> userCleanlinessRatings;
+    Map<String, Object> favorites;
+    Map<String, Object> document = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +97,86 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
         final TextView nameTextView = findViewById(R.id.restroomName);
         final TextView genderTextView = findViewById(R.id.genderDisplay);
-        final TextView createdBy = findViewById(R.id.createdByDisplay);
-        final TextView createdAt = findViewById(R.id.createdAtDisplay);
+        createdBy = findViewById(R.id.createdByDisplay);
+        createdAt = findViewById(R.id.createdAtDisplay);
+
+        favoriteButton = findViewById(R.id.favButton);
+
+        cleanliness = findViewById(R.id.reviewStarsCleanliness);
+        privacy = findViewById(R.id.reviewStarsPrivacy);
+
+        privacyNo = findViewById(R.id.privacy_no);
+        cleanlinessNo = findViewById(R.id.cleanliness_no);
+
+        userPrivacyRatings = new HashMap<>();
+        userCleanlinessRatings = new HashMap<>();
+        favorites = null;
+
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(favorites == null){
+                    favorites = new HashMap<>();
+                    favorites.put(getIntent().getStringExtra("uid"), true);
+                    favoriteButton.setImageResource((android.R.drawable.btn_star_big_on));
+                }
+                else if ((boolean)favorites.get(getIntent().getStringExtra("uid")) == true){
+                    favorites.put(getIntent().getStringExtra("uid"), false);
+                    document.put("favorites", favorites);
+                    favoriteButton.setImageResource((android.R.drawable.btn_star_big_off));
+                }
+                else{
+                    favorites.put(getIntent().getStringExtra("uid"), true);
+                    document.put("favorites", favorites);
+                    favoriteButton.setImageResource((android.R.drawable.btn_star_big_on));
+                }
+
+                db.collection("restrooms").document(getIntent().getStringExtra("id")).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+            }
+        });
+
+
+        final Button reviewButton = findViewById(R.id.reviewButton);
+        reviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (document != null) {
+                    userCleanlinessRatings.put(getIntent().getStringExtra("uid"), (double) cleanliness.getRating());
+                    userPrivacyRatings.put(getIntent().getStringExtra("uid"), (double) privacy.getRating());
+                    document.put("privacy", userPrivacyRatings);
+                    document.put("cleanliness", userCleanlinessRatings);
+
+                    db.collection("restrooms").document(getIntent().getStringExtra("id")).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(RestroomViewScreen.this, "Rating saved", Toast.LENGTH_SHORT).show();
+
+                            privacy.setRating((float) getAveragePrivacyRating());
+                            privacyNo.setText(userPrivacyRatings.size() + " rating(s)");
+                            cleanliness.setRating((float) getAverageCleanlinessRating());
+                            cleanlinessNo.setText(userCleanlinessRatings.size() + " rating(s)");
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(RestroomViewScreen.this, "Rating failed to save", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
 
 
         listView = (ListView) findViewById(R.id.listViewOptional);
@@ -92,28 +189,38 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
         restRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    Map<String, Object> document = task.getResult().getData();
+                if (task.isSuccessful()) {
+                    document = task.getResult().getData();
                     GeoPoint geopoint = (GeoPoint) document.get("location");
                     double lat = geopoint.getLatitude();
                     double lng = geopoint.getLongitude();
-                    LatLng ll = new LatLng(lat,lng);
+                    LatLng ll = new LatLng(lat, lng);
                     restroomLocation = ll;
                     longitudeTextView.setText(Double.toString(lng));
 
-                    nameTextView.setText((String)document.get("name"));
+                    nameTextView.setText((String) document.get("name"));
+                    String createdByText = "";
 
 
+                    favorites = (Map<String, Object>) document.get("favorites");
+                    if(favorites == null){
+                        favoriteButton.setImageResource((android.R.drawable.btn_star_big_off));
+                    }
+                    else if ((boolean)favorites.get(getIntent().getStringExtra("uid")) == true){
+                        favoriteButton.setImageResource((android.R.drawable.btn_star_big_on));
+                    }
+                    else{
+                        favoriteButton.setImageResource((android.R.drawable.btn_star_big_off));
+                    }
                     //lookup current user of creator
                     db.collection("users").document((String) document.get("createdby")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if(task.isSuccessful() && task.getResult().getData() != null){
+                            if (task.isSuccessful() && task.getResult().getData() != null) {
                                 String createdByText = "Created by: " + (String) task.getResult().getData().get("username");
                                 createdBy.setText(createdByText);
 
-                            }
-                            else{
+                            } else {
                                 String createdByText = "Created by: Deleted User";
                                 createdBy.setText(createdByText);
                             }
@@ -126,117 +233,124 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 //                    String stringTimeSince = DateUtils.getRelativeTimeSpanString(document.get("created"), FieldValue.serverTimestamp(), DateUtils.MINUTE_IN_MILLIS, document.get("created");
 //                    whenTextView.setText( Integer.toString(now().compareTo(created)));
 
-                    createdAt.setText(relativeTime);
+                        createdAt.setText(relativeTime);
 
 
-                    String dbOpen = (String)document.get("opens");
-                    String dbClose = (String)document.get("closes");
+                    String dbOpen = (String) document.get("opens");
+                    String dbClose = (String) document.get("closes");
 
-                    if(dbOpen.equals("24 hours")){
+                    adapter.notifyDataSetChanged();
+
+                    if (dbOpen.equals("24 hours")) {
                         listItems.add("Open 24 Hours");
                         adapter.notifyDataSetChanged();
-                    }
-                    else{
+                    } else {
                         String a = "Open: " + dbOpen + " - " + dbClose;
                         listItems.add(a);
                         adapter.notifyDataSetChanged();
 
                     }
 
-                    //Change these to be scores based on averages from reviews
-                    listItems.add("Cleanliness: ");
-                    adapter.notifyDataSetChanged();
-
-                    listItems.add("Privacy: ");
-                    adapter.notifyDataSetChanged();
+//                    //Change these to be scores based on averages from reviews
+//                    listItems.add("Cleanliness: ");
+//                    adapter.notifyDataSetChanged();
+//
+//                    listItems.add("Privacy: ");
+//                    adapter.notifyDataSetChanged();
 
                     Boolean babyBoolean = (Boolean) document.get("babychanging");
-                    if(babyBoolean){
+                    if (babyBoolean) {
                         listItems.add("Baby Changing Station Available");
                         adapter.notifyDataSetChanged();
-                    }
-                    else{
+                    } else {
                         listItems.add("No Baby Changing Stations");
                         adapter.notifyDataSetChanged();
 
                     }
 
                     Boolean handicapBoolean = (Boolean) document.get("handicapped");
-                    if(handicapBoolean){
+                    if (handicapBoolean) {
                         listItems.add("Handicap Accessible");
                         adapter.notifyDataSetChanged();
-                    }
-                    else{
+                    } else {
                         listItems.add("Not Handicap Accessible");
                         adapter.notifyDataSetChanged();
                     }
 
-                    Boolean keyBoolean = (Boolean)document.get("keyrequired");
-                    if(keyBoolean){
+                    Boolean keyBoolean = (Boolean) document.get("keyrequired");
+                    if (keyBoolean) {
                         listItems.add("Key is Required for Access");
                         adapter.notifyDataSetChanged();
-                    }
-                    else{
+                    } else {
                         listItems.add("No Key Required for Access");
                         adapter.notifyDataSetChanged();
                     }
 
-                    String b = "Floor: " + (String)document.get("floor");
+                    String b = "Floor: " + (String) document.get("floor");
                     listItems.add(b);
                     adapter.notifyDataSetChanged();
 
 
-                    String dbGender = (String)document.get("gender");
+                    String dbGender = (String) document.get("gender");
 
-                    if(dbGender.equals("Family")){
+                    if (dbGender.equals("Family")) {
                         genderTextView.setText("Family Restroom");
-                    }
-                    else if(dbGender.equals("Men")){
+                    } else if (dbGender.equals("Men")) {
                         genderTextView.setText("Men's Room");
 
-                    }
-                    else if(dbGender.equals("Women")){
+                    } else if (dbGender.equals("Women")) {
                         genderTextView.setText("Women's Room");
 
-                    }
-                    else {
+                    } else {
                         genderTextView.setText("Unisex Restroom");
                     }
 
-                    String dbAutomatic = (String)document.get("automatictoilets");
-                    if(dbAutomatic.equals("Yes")){
+                    String dbAutomatic = (String) document.get("automatictoilets");
+                    if (dbAutomatic.equals("Yes")) {
                         listItems.add("Automatic Toilets");
                         adapter.notifyDataSetChanged();
-                    } else if(dbAutomatic.equals("No")){
+                    } else if (dbAutomatic.equals("No")) {
                         listItems.add("No Automatic Toilets");
                         adapter.notifyDataSetChanged();
                     }
 
-                    String dbInside = (String)document.get("insidebuilding");
-                    if(dbInside.equals("Yes")){
+                    String dbInside = (String) document.get("insidebuilding");
+                    if (dbInside.equals("Yes")) {
                         listItems.add("Inside Building");
                         adapter.notifyDataSetChanged();
-                    } else if(dbInside.equals("No")){
+                    } else if (dbInside.equals("No")) {
                         listItems.add("Accessible from Outside Building");
                         adapter.notifyDataSetChanged();
                     }
 
-                    String dbDirections = (String)document.get("directions");
-                    if(!dbDirections.equals("")){
+                    String dbDirections = (String) document.get("directions");
+                    if (!dbDirections.equals("")) {
                         listItems.add("Directions: " + dbDirections);
                         adapter.notifyDataSetChanged();
                     }
 
-                    String dbStalls = (String)document.get("stalls");
-                    if(!dbStalls.equals("Leave Blank")){
+                    String dbStalls = (String) document.get("stalls");
+                    if (!dbStalls.equals("Leave Blank")) {
                         listItems.add("Number of Stalls: " + dbStalls);
                         adapter.notifyDataSetChanged();
                     }
 
+                    userCleanlinessRatings = (Map<String, Object>) document.get("cleanliness");
+                    userPrivacyRatings = (Map<String, Object>) document.get("privacy");
 
-                    String dbImage = (String)document.get("image");
+                    double cleanRating = getAverageCleanlinessRating();
+                    cleanliness.setRating((float) cleanRating);
+
+                    double privacyRating = getAveragePrivacyRating();
+                    privacy.setRating((float) privacyRating);
+
+                    privacyNo.setText(userPrivacyRatings.size() + " rating(s)");
+                    cleanlinessNo.setText(userCleanlinessRatings.size() + " rating(s)");
+
+                    String dbImage = (String) document.get("image");
                     ImageView showPhoto = (ImageView) findViewById(R.id.imgView);
 
+                    setListViewHeightBasedOnChildren(listView);
 
                     StorageReference storageRef = storageReference.child(dbImage);//reach out to your photo file hierarchically
                     storageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
@@ -252,19 +366,34 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
                         }
                     });
 
-                }
-                else{
+                } else {
 
                 }
             }
         });
 
 
-
-
     }
 
-    public void openReportScreen(View view){
+    private double getAveragePrivacyRating() {
+        double privacyRating = 0;
+        for (Map.Entry<String, Object> entry : userPrivacyRatings.entrySet()) {
+            privacyRating += (Double) entry.getValue();
+        }
+        privacyRating = privacyRating / userCleanlinessRatings.size();
+        return privacyRating;
+    }
+
+    private double getAverageCleanlinessRating() {
+        double cleanRating = 0;
+        for (Map.Entry<String, Object> entry : userCleanlinessRatings.entrySet()) {
+            cleanRating += (Double) entry.getValue();
+        }
+        cleanRating = cleanRating / userCleanlinessRatings.size();
+        return cleanRating;
+    }
+
+    public void openReportScreen(View view) {
         Intent intent = new Intent(this, RestroomReportingScreen.class);
         intent.putExtra("id", getIntent().getStringExtra("id"));
         startActivity(intent);
@@ -276,6 +405,11 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
         miniMap = googleMap;
         miniMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
+        miniMap.setMyLocationEnabled(true);
 
         final TextView longitudeTextView = findViewById(R.id.view_longitude);
 
@@ -298,4 +432,27 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
 
     }
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
+
+        int totalHeight = 0;
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(),
+                View.MeasureSpec.AT_MOST);
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight
+                + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
+    }
+
 }
