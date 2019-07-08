@@ -48,11 +48,20 @@ public class RestroomReportingScreen extends AppCompatActivity {
         deleteRestroom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+            }
+        });
+
+        Button reportRestroom = findViewById(R.id.button_report);
+
+        reportRestroom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 db.collection("restrooms").document(getIntent().getStringExtra("id")).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(RestroomReportingScreen.this, "Restroom delete", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RestroomReportingScreen.this, "Restroom reported", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(RestroomReportingScreen.this, MainMap.class));
                         }
                     }

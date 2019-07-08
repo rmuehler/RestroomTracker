@@ -66,6 +66,10 @@
     <string name="display15">Display 15</string>
     <string name="display25">Display 25</string>
 
+
+    <string name="lat">Lat:</string>
+    <string name="lng">Long:</string>
+
     <string-array name="numStallsArray">
         <item>Leave Blank</item>
         <item>1</item>
