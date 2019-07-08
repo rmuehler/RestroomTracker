@@ -6,28 +6,24 @@
     android:layout_height="match_parent"
     tools:context=".ListOfRestroomsScreen">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="128dp"
-        android:layout_height="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="36dp"
-        android:text="@string/title_list"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.097"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimaryDark"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="@string/title_list"
+        app:titleTextColor="#FFFFFF" />
 
-    <ListView
-        android:id="@+id/list_nearby"
-        android:layout_width="395dp"
-        android:layout_height="655dp"
-        android:layout_marginTop="71dp"
-        android:layout_marginEnd="8dp"
-        android:entries="@array/list_array"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+        tools:layout_editor_absoluteX="19dp" />
+
 </android.support.constraint.ConstraintLayout>
