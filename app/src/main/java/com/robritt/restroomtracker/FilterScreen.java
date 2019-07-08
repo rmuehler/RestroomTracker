@@ -41,7 +41,7 @@ public class FilterScreen extends AppCompatActivity {
         distance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                distance_display.setText(progress + " meters");
+                distance_display.setText(progress + " km");
             }
 
             @Override
