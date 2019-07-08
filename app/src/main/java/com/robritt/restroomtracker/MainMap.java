@@ -338,6 +338,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
                         LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
 
+
                         double distance = SphericalUtil.computeDistanceBetween(locationMarker.getPosition(), restroomLocation); //calc distance
 
 
