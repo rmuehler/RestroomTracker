@@ -1,6 +1,9 @@
 package com.robritt.restroomtracker;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +27,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,6 +40,7 @@ import com.google.firebase.firestore.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +56,12 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
     ArrayAdapter<String> adapter;
 
     LatLng restroomLocation = new LatLng(0,0);
+
+    RatingBar cleanliness, privacy;
+
+    Map<String, Object> userPrivacyRatings;
+    Map<String, Object> userCleanlinessRatings;
+    Map<String, Object> document = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +86,41 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
         final TextView floorTextView = findViewById(R.id.floorDisplay);
         final TextView genderTextView = findViewById(R.id.genderDisplay);
 
+        cleanliness = findViewById(R.id.reviewStarsCleanliness);
+        privacy = findViewById(R.id.reviewStarsPrivacy);
+
+        userPrivacyRatings = new HashMap<>();
+        userCleanlinessRatings = new HashMap<>();
+
+        final Button reviewButton = findViewById(R.id.reviewButton);
+        reviewButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                userCleanlinessRatings.put(getIntent().getStringExtra("uid"), (double)cleanliness.getRating());
+                userPrivacyRatings.put(getIntent().getStringExtra("uid"), (double) privacy.getRating());
+                document.put("privacy", userPrivacyRatings);
+                document.put("cleanliness", userCleanlinessRatings);
+
+                db.collection("restrooms").document(getIntent().getStringExtra("id")).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(RestroomViewScreen.this, "Rating saved", Toast.LENGTH_SHORT).show();
+
+                        privacy.setRating((float) getAveragePrivacyRating());
+                        cleanliness.setRating((float) getAverageCleanlinessRating());
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(RestroomViewScreen.this, "Rating failed to save", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
 
         listView = (ListView) findViewById(R.id.listViewOptional);
         listItems = new ArrayList<String>();
@@ -85,7 +133,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if(task.isSuccessful()){
-                    Map<String, Object> document = task.getResult().getData();
+                    document = task.getResult().getData();
                     GeoPoint geopoint = (GeoPoint) document.get("location");
                     double lat = geopoint.getLatitude();
                     double lng = geopoint.getLongitude();
@@ -183,16 +231,22 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
                         adapter.notifyDataSetChanged();
                     }
 
+                    userCleanlinessRatings = (Map<String, Object>) document.get("cleanliness");
+                    userPrivacyRatings = (Map<String, Object>) document.get("privacy");
+
+                    double cleanRating = getAverageCleanlinessRating();
+                    double privacyRating = getAveragePrivacyRating();
 
 
 
+
+
+                    cleanliness.setRating((float) cleanRating);
+                    privacy.setRating((float) privacyRating);
 
 
                     Timestamp created = (Timestamp) document.get("created");
-//                    String relativeTime = (String) DateUtils.getRelativeTimeSpanString(created.toDate().getTime(), now().toDate().getTime(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
                     String relativeTime = (String) DateUtils.getRelativeTimeSpanString(created.toDate().getTime());
-//                    String stringTimeSince = DateUtils.getRelativeTimeSpanString(document.get("created"), FieldValue.serverTimestamp(), DateUtils.MINUTE_IN_MILLIS, document.get("created");
-//                    whenTextView.setText( Integer.toString(now().compareTo(created)));
                     whenTextView.setText(relativeTime);
 
 
@@ -221,6 +275,24 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
 
 
+    }
+
+    private double getAveragePrivacyRating(){
+        double privacyRating = 0;
+        for (Map.Entry<String, Object> entry : userPrivacyRatings.entrySet()){
+            privacyRating += (Double) entry.getValue();
+        }
+        privacyRating = privacyRating / userCleanlinessRatings.size();
+        return privacyRating;
+    }
+
+    private double getAverageCleanlinessRating(){
+        double cleanRating = 0;
+        for (Map.Entry<String, Object> entry : userCleanlinessRatings.entrySet()){
+            cleanRating += (Double) entry.getValue();
+        }
+        cleanRating = cleanRating / userCleanlinessRatings.size();
+        return cleanRating;
     }
 
     public void openReportScreen(View view){
