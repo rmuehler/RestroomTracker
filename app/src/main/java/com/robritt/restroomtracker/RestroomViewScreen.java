@@ -58,6 +58,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
     LatLng restroomLocation = new LatLng(0,0);
 
     RatingBar cleanliness, privacy;
+    TextView privacyNo, cleanlinessNo;
 
     Map<String, Object> userPrivacyRatings;
     Map<String, Object> userCleanlinessRatings;
@@ -89,6 +90,9 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
         cleanliness = findViewById(R.id.reviewStarsCleanliness);
         privacy = findViewById(R.id.reviewStarsPrivacy);
 
+        privacyNo = findViewById(R.id.privacy_no);
+        cleanlinessNo = findViewById(R.id.cleanliness_no);
+
         userPrivacyRatings = new HashMap<>();
         userCleanlinessRatings = new HashMap<>();
 
@@ -109,7 +113,9 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
                         Toast.makeText(RestroomViewScreen.this, "Rating saved", Toast.LENGTH_SHORT).show();
 
                         privacy.setRating((float) getAveragePrivacyRating());
+                        privacyNo.setText(userPrivacyRatings.size() + " rating(s)");
                         cleanliness.setRating((float) getAverageCleanlinessRating());
+                        cleanlinessNo.setText(userCleanlinessRatings.size() + " rating(s)");
 
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -242,7 +248,9 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
 
                     cleanliness.setRating((float) cleanRating);
+                    cleanlinessNo.setText(userCleanlinessRatings.size() + " rating(s)");
                     privacy.setRating((float) privacyRating);
+                    privacyNo.setText(userPrivacyRatings.size() + " rating(s)");
 
 
                     Timestamp created = (Timestamp) document.get("created");
