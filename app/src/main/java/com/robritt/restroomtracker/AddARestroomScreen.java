@@ -138,6 +138,7 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         double lng = bundle.getDouble("longitude");
 
         lastLocation = new LatLng(lat, lng);
+        positionOfMarker = lastLocation;
 
 
 
@@ -443,7 +444,7 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         newRestroom.put("babychanging", sBaby.isChecked());
         newRestroom.put("handicapped", sHandicap.isChecked());
         newRestroom.put("keyrequired", sKey.isChecked());
-        newRestroom.put("gender", rCheckedGender.getText());
+        newRestroom.put("gender", rCheckedGender.getText().toString());
 
         cleanlinessRating.put(mAuth.getCurrentUser().getUid(), rCleanliness.getRating()); //we need to store this in maps to the UID is linked to rating
         newRestroom.put("cleanliness", cleanlinessRating);
