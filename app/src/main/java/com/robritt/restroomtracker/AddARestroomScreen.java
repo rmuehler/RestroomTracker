@@ -140,9 +140,6 @@ public class AddARestroomScreen extends AppCompatActivity implements OnMapReadyC
         lastLocation = new LatLng(lat, lng);
         positionOfMarker = lastLocation;
 
-
-
-
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
