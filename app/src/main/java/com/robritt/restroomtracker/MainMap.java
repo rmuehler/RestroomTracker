@@ -2,6 +2,7 @@ package com.robritt.restroomtracker;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Handler;
@@ -68,6 +69,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     FloatingActionButton mArButton;
     boolean isFABOpen = false;
     private ArrayList<Marker> mMarkers = new ArrayList<Marker>();
+    SharedPreferences filters;
 
 
     @Override
@@ -75,6 +77,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        filters = getSharedPreferences("filters", MODE_PRIVATE);
         mArButton = (FloatingActionButton) findViewById(R.id.open_ar_button);
 //        maybeEnableArButton();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -161,6 +164,9 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
 
     public void openAddScreen(View view) {
+        if(locationMarker == null){
+            return;
+        }
         Intent intent = new Intent(this, AddARestroomScreen.class);
         intent.putExtra("latitude", locationMarker.getPosition().latitude);
         intent.putExtra("longitude", locationMarker.getPosition().longitude);
@@ -184,7 +190,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
     public void openFilterScreen(View view) {
         Intent intent = new Intent(this, FilterScreen.class);
-        startActivity(intent);
+        startActivityForResult(intent, 500);
     }
 
 
@@ -270,8 +276,14 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (resultCode == RESULT_OK && requestCode == 1){
+        if (resultCode == RESULT_OK && requestCode == 1){ //after adding a restroom
 //            updateRestroomLocations();
+        }
+        if (resultCode == RESULT_OK && requestCode == 500){ //after changing filters
+//            Toast.makeText(instance, "Filters saved", Toast.LENGTH_SHORT).show();
+            updateRestroomLocations();
+//            this.recreate();
+
         }
     }
 
@@ -291,20 +303,56 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                     mMarkers.clear();
 
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        if (doc.getBoolean("open") !=  false) {
-                            GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
-                            LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
-                            Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title(doc.getString("name"))
-                                    .snippet((String)doc.getString("directions"))
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))); //TODO we can have a custom restroom icon here
+                        //gets the average ratings for each category:
+                        Map<String, Object> cleanlinessRatings = (Map) doc.getData().get("cleanliness");
+                        Map<String, Object> privacyRatings = (Map) doc.getData().get("privacy");
 
-                            marker.setTag(doc.getId());
-                            mMarkers.add(marker);
+                        double cleanRating = 0;
+                        double privacyRating = 0;
+
+                        for (Map.Entry<String, Object> entry : cleanlinessRatings.entrySet()){
+                            cleanRating += (Double) entry.getValue();
                         }
+                        cleanRating = cleanRating / cleanlinessRatings.size();
+
+                        for (Map.Entry<String, Object> entry : privacyRatings.entrySet()){
+                            privacyRating += (Double) entry.getValue();
+                        }
+                        privacyRating = privacyRating / cleanlinessRatings.size();
+
+
+                        if(filters.getBoolean("baby",false) && doc.getBoolean("babychanging") == false){
+                            //do nothing
+                        }
+                        else if(filters.getBoolean("handicap",false) && doc.getBoolean("handicapped") == false){
+                            //do nothing
+                        }
+                        else if (filters.getFloat("privacy", 0) > privacyRating){
+
+                        }
+                        else if (filters.getFloat("cleanliness", 0) > cleanRating){
+
+                        }
+
+
+
+
+
+                        else {
+                                GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
+                                LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
+                                Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title(doc.getString("name"))
+                                        .snippet((String) doc.getString("directions"))
+                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))); //TODO we can have a custom restroom icon here
+
+                                marker.setTag(doc.getId());
+                                mMarkers.add(marker);
+                            }
+
                     }
 
                     //TODO filter markers based on custom distance filter
-                    // filterRestroooms();
+//                     filterRestrooms();
 
                     }
                 });
@@ -376,6 +424,23 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
+    public void filterRestrooms(){
+
+
+        for (Marker marker : mMarkers) {
+//            db.collection("restrooms").document().get
+            //location based filters
+
+
+            //filtering on preferences
+            if (filters.getBoolean("baby", false) || filters.getBoolean("handicap", false)){
+                db.collection("restrooms").document();
+                marker.setVisible(false);
+            }
+
+
+        }
+    }
 
 
 
