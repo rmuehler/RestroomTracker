@@ -15,15 +15,49 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="@string/title_list"
+        app:title="@string/title_fav"
         app:titleTextColor="#FFFFFF" />
 
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycleView"
+    <RadioGroup
+        android:id="@+id/rgNumResults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar">
+
+        <RadioButton
+            android:id="@+id/nearest5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/display5" />
+
+        <RadioButton
+            android:id="@+id/nearest15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/display15" />
+
+        <RadioButton
+            android:id="@+id/nearest25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/display25" />
+    </RadioGroup>
+
+    <ListView
+        android:id="@+id/list_nearby"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
-        tools:layout_editor_absoluteX="19dp" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rgNumResults" />
 
 </android.support.constraint.ConstraintLayout>

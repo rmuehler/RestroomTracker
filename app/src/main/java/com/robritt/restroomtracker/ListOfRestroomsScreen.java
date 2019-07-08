@@ -2,18 +2,15 @@ package com.robritt.restroomtracker;
 
 import android.content.Intent;
 import android.location.Location;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -35,23 +32,12 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
 
     FirebaseFirestore db;
     double latitude, longitude;
-
-    private RecyclerView recyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager layoutManager;
-
-    Location currentLocation;
-    /*
     Location currentLocation;
     ArrayList<String> listItems;
     ArrayAdapter<String> adapter;
-
-    */
     Map<Long,String> listToID = new HashMap<>();
     TreeMap<Float, String> distanceID = new TreeMap<>();
-
-
-    ArrayList<String> myDataset;
+    TreeMap<String, String> restroomNames = new TreeMap<>();
 
 
     @Override
@@ -62,42 +48,43 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
         Intent intent = getIntent();
         latitude = getIntent().getDoubleExtra("latitude",0);
         longitude = getIntent().getDoubleExtra("longitude", 0);
-
-        myDataset = new ArrayList<String>();
-        myDataset.add("Hello");
-
-        recyclerView = (RecyclerView) findViewById(R.id.recycleView);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        recyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-
-        // specify an adapter (see also next example)
-        mAdapter = new MyAdapter(myDataset);
-        recyclerView.setAdapter(mAdapter);
-
-
         currentLocation = new Location("Current Location");
         currentLocation.setLongitude(longitude);
         currentLocation.setLatitude(latitude);
-
-
-
-
 //        HashMap<Marker, String> markerToID = (HashMap<Marker, String>) intent.getSerializableExtra("map"); //gets the marker/ ID referance from mainmap
-
-        /*
         //List stuff
         ListView mList = (ListView) findViewById(R.id.list_nearby);
         listItems = new ArrayList<String>();
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
+        adapter = new ArrayAdapter<String>(this, R.layout.list_tv_text, listItems);
         mList.setAdapter(adapter);
 
-        updateRestroomsList(25); //TODO allow user to choose how many to display
+        RadioButton rb5 = (RadioButton) findViewById(R.id.nearest5);
+        RadioButton rb15 = (RadioButton) findViewById(R.id.nearest15);
+        RadioButton rb25 = (RadioButton) findViewById(R.id.nearest25);
+
+
+        updateRestroomsList(5);
+
+        rb5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateRestroomsList(5);
+            }
+        });
+
+        rb15.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateRestroomsList(15);
+            }
+        });
+        rb25.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateRestroomsList(25);
+            }
+        });
+
 
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -116,10 +103,8 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
             }
         });
 
-        */
-
     } //end oncreate
-/*
+
     private void updateRestroomsList(final int numberToDisplay) { //get all restrooms in database with the value "open"
 
         db.collection("restrooms")
@@ -144,11 +129,8 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                                 location.setLongitude(longitude);
                                 float distance =  location.distanceTo(currentLocation);
                                 distance = Math.round(distance);
-
-
                                 distanceID.put(distance, doc.getId());
-
-
+                                restroomNames.put(doc.getId(), (String)doc.getData().get("name"));
 
                             }
                             else{
@@ -161,8 +143,15 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                                 break;
 
                             }
+
+                            String restroomID =  (String) m.getValue();
+                            String restroomName = restroomNames.get(restroomID);
+
+                            int listIdInt = (int)listID;
+                            int listIdIntPlusOne = listIdInt + 1;
+                            String numberListing = Integer.toString(listIdIntPlusOne);
                             String distanceString = Float.toString((Float) m.getKey());
-                            adapter.add("Restrooms\n\tDistance " + distanceString + " meters"); //TODO m.getValue() gives us restroomUID, can be used to pull info like tags to display
+                            adapter.add(numberListing + " " + restroomName + "\n\t\tDistance " + distanceString + " meters"); //TODO m.getValue() gives us restroomUID, can be used to pull info like tags to display
                             listToID.put(listID, (String) m.getValue()); //add reference ID when adding stuff to ListView, for lookup in onClickListener
                             listID++;
                         }
@@ -173,9 +162,6 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
     } //end restroomlocatiosn
 
 
-*/
+
 
 } //end class
-
-
-

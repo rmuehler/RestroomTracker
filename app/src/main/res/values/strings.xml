@@ -61,6 +61,11 @@
 
     <string name="review">Leave Review</string>
     <string name="reviewPrompt">Leave Your Own Review:</string>
+
+    <string name="display5">Display 5</string>
+    <string name="display15">Display 15</string>
+    <string name="display25">Display 25</string>
+
     <string-array name="numStallsArray">
         <item>Leave Blank</item>
         <item>1</item>
