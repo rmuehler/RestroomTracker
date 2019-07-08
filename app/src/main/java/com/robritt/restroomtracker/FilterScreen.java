@@ -8,7 +8,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RatingBar;
+import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 public class FilterScreen extends AppCompatActivity {
 
@@ -16,6 +20,8 @@ public class FilterScreen extends AppCompatActivity {
     SharedPreferences.Editor editor;
     Switch handicap, baby;
     RatingBar privacy, cleanliness;
+    SeekBar distance;
+    TextView distance_display;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,11 +34,32 @@ public class FilterScreen extends AppCompatActivity {
         baby = findViewById(R.id.filter_baby);
         privacy = findViewById(R.id.filter_privacy);
         cleanliness = findViewById(R.id.filter_clean);
+        distance = findViewById(R.id.filter_distance);
+        distance_display = findViewById(R.id.text_filter_distance);
+
+
+        distance.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                distance_display.setText(progress + " meters");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
 
         handicap.setChecked(filters.getBoolean("handicap", false));
         baby.setChecked(filters.getBoolean("baby", false));
         privacy.setRating(filters.getFloat("privacy", 0));
         cleanliness.setRating(filters.getFloat("cleanliness", 0));
+        distance.setProgress(filters.getInt("distance", 10));
 
         Button saveButton =  findViewById(R.id.button_filter_save);
 
@@ -43,6 +70,7 @@ public class FilterScreen extends AppCompatActivity {
                 editor.putBoolean("handicap", handicap.isChecked());
                 editor.putFloat("privacy", privacy.getRating());
                 editor.putFloat("cleanliness", cleanliness.getRating());
+                editor.putInt("distance", distance.getProgress());
 
                 editor.commit();
                 Intent returnIntent = new Intent();

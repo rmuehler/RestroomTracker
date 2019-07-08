@@ -42,6 +42,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.maps.android.SphericalUtil;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -320,6 +321,12 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         }
                         privacyRating = privacyRating / cleanlinessRatings.size();
 
+                        //find the distance from current Location to marker
+                        GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
+                        LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
+
+                        double distance = SphericalUtil.computeDistanceBetween(locationMarker.getPosition(), restroomLocation); //calc distance
+
 
                         if(filters.getBoolean("baby",false) && doc.getBoolean("babychanging") == false){
                             //do nothing
@@ -333,14 +340,10 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         else if (filters.getFloat("cleanliness", 0) > cleanRating){
 
                         }
+                        else if (filters.getInt("distance", 10) < distance){
 
-
-
-
-
+                        }
                         else {
-                                GeoPoint geopoint = (GeoPoint) doc.getData().get("location");
-                                LatLng restroomLocation = new LatLng(geopoint.getLatitude(), geopoint.getLongitude());
                                 Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title(doc.getString("name"))
                                         .snippet((String) doc.getString("directions"))
                                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))); //TODO we can have a custom restroom icon here
