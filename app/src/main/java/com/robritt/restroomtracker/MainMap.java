@@ -340,7 +340,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                         else if (filters.getFloat("cleanliness", 0) > cleanRating){
 
                         }
-                        else if (filters.getInt("distance", 10) < distance){
+                        else if ((filters.getInt("distance", 10) * 1000) < distance){
 
                         }
                         else {
