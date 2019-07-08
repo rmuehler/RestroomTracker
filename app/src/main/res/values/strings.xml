@@ -72,7 +72,7 @@
     <string name="lat">Lat:</string>
     <string name="lng">Long:</string>
     <string name="sendReport">Send Report</string>
-
+    <string name="reportPrompt">Please explain in detail the reason for your report:"</string>
 
     <string-array name="numStallsArray">
         <item>Leave Blank</item>

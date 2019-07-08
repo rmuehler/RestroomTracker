@@ -10,15 +10,21 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RestroomReportingScreen extends AppCompatActivity {
 
     FirebaseFirestore db;
 
+    Map<String, String> document = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,39 +32,37 @@ public class RestroomReportingScreen extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         setContentView(R.layout.activity_restroom_reporting_screen);
 
-        final EditText latEdit = findViewById(R.id.edit_lat);
-        final EditText longEdit = findViewById(R.id.edit_long);
-
-
-        db.collection("restrooms").document(getIntent().getStringExtra("id")).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()){
-                    DocumentSnapshot document = task.getResult();
-                    GeoPoint geoPoint = (GeoPoint) document.get("location");
-                    latEdit.setText(Double.toString(geoPoint.getLatitude()));
-                    longEdit.setText(Double.toString(geoPoint.getLongitude()));
-
-                }
-            } //TODO fail conditions
-        });
-
-
-
+        EditText reportEditText = (EditText) findViewById(R.id.reportDescription);
         Button reportRestroom = findViewById(R.id.button_report);
 
         reportRestroom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                db.collection("restrooms").document(getIntent().getStringExtra("id")).delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            Toast.makeText(RestroomReportingScreen.this, "Restroom reported", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(RestroomReportingScreen.this, MainMap.class));
-                        }
+
+                String userReport = reportEditText.getText().toString();
+                document.put("report", userReport);
+
+                if(document != null){
+                    if (reportEditText.getText().toString().length() == 0){ //report required
+                        reportEditText.setError("Report Required");
+                        return;
                     }
-                });
+
+
+                    db.collection("restrooms").document(getIntent().getStringExtra("id")).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(RestroomReportingScreen.this, "Report saved", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(RestroomReportingScreen.this, "Report failed to save", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
             }
         });
     }
