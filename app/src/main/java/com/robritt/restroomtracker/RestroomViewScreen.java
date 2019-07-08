@@ -192,12 +192,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
                     }
 
-                    //Change these to be scores based on averages from reviews
-                    listItems.add("Cleanliness: ");
-                    adapter.notifyDataSetChanged();
 
-                    listItems.add("Privacy: ");
-                    adapter.notifyDataSetChanged();
 
                     Boolean babyBoolean = (Boolean) document.get("babychanging");
                     if(babyBoolean){

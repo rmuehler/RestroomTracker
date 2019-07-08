@@ -2,6 +2,7 @@ package com.robritt.restroomtracker;
 
 import android.content.Intent;
 import android.location.Location;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +37,7 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
     ArrayAdapter<String> adapter;
     Map<Long,String> listToID = new HashMap<>();
     TreeMap<Float, String> distanceID = new TreeMap<>();
+    TreeMap<String, String> restroomNames = new TreeMap<>();
 
 
     @Override
@@ -52,11 +55,35 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
         //List stuff
         ListView mList = (ListView) findViewById(R.id.list_nearby);
         listItems = new ArrayList<String>();
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, listItems);
+        adapter = new ArrayAdapter<String>(this, R.layout.list_tv_text, listItems);
         mList.setAdapter(adapter);
 
+        RadioButton rb5 = (RadioButton) findViewById(R.id.nearest5);
+        RadioButton rb15 = (RadioButton) findViewById(R.id.nearest15);
+        RadioButton rb25 = (RadioButton) findViewById(R.id.nearest25);
 
-        updateRestroomsList(25); //TODO allow user to choose how many to display
+
+        updateRestroomsList(5);
+
+        rb5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateRestroomsList(5);
+            }
+        });
+
+        rb15.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateRestroomsList(15);
+            }
+        });
+        rb25.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateRestroomsList(25);
+            }
+        });
 
 
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -102,11 +129,8 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                                 location.setLongitude(longitude);
                                 float distance =  location.distanceTo(currentLocation);
                                 distance = Math.round(distance);
-
-
                                 distanceID.put(distance, doc.getId());
-
-
+                                restroomNames.put(doc.getId(), (String)doc.getData().get("name"));
 
                             }
                             else{
@@ -119,21 +143,18 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                                 break;
 
                             }
+
+                            String restroomID =  (String) m.getValue();
+                            String restroomName = restroomNames.get(restroomID);
+
+                            int listIdInt = (int)listID;
+                            int listIdIntPlusOne = listIdInt + 1;
+                            String numberListing = Integer.toString(listIdIntPlusOne);
                             String distanceString = Float.toString((Float) m.getKey());
-                            adapter.add("Restrooms\n\tDistance " + distanceString + " meters"); //TODO m.getValue() gives us restroomUID, can be used to pull info like tags to display
+                            adapter.add(numberListing + " " + restroomName + "\n\t\tDistance " + distanceString + " meters"); //TODO m.getValue() gives us restroomUID, can be used to pull info like tags to display
                             listToID.put(listID, (String) m.getValue()); //add reference ID when adding stuff to ListView, for lookup in onClickListener
                             listID++;
                         }
-
-
-
-
-
-
-
-
-
-
 
                     }
                 });
@@ -144,5 +165,3 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
 
 
 } //end class
-
-
