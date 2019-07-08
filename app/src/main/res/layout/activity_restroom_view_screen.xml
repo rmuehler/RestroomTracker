@@ -24,9 +24,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        app:layout_constraintTop_toBottomOf="@+id/my_toolbar"/>
-
-
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
 
 
     <Button
@@ -34,12 +32,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:textColor="#FFFFFF"
         android:layout_marginRight="32dp"
         android:layout_marginBottom="32dp"
+        android:backgroundTint="@color/colorPrimaryDark"
         android:onClick="openReportScreen"
         android:text="@string/title_report"
+        android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -51,11 +49,6 @@
         android:text="TextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
-
-
-
 
 
     <TextView
@@ -82,7 +75,6 @@
         app:layout_constraintTop_toBottomOf="@+id/restroomName" />
 
 
-
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
@@ -93,8 +85,10 @@
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/report_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/genderDisplay">
+        app:layout_constraintTop_toBottomOf="@+id/genderDisplay"
+        app:layout_constraintVertical_bias="1.0">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout2"
@@ -209,9 +203,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="4dp"
+                android:text="@string/reviewPrompt"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:text="@string/reviewPrompt"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/listViewOptional" />
 
@@ -234,6 +228,7 @@
                 android:progress="2"
                 android:progressTint="#FFC107"
                 android:secondaryProgressTint="@android:color/transparent"
+                app:layout_constraintStart_toEndOf="@+id/cleanliness_no"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/reviewPromptCleanliness" />
 
@@ -254,8 +249,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
-                android:secondaryProgressTint="@android:color/transparent"
                 android:progressTint="#FFC107"
+                android:secondaryProgressTint="@android:color/transparent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/reviewPromptPrivacy" />
 
@@ -263,20 +258,33 @@
                 android:id="@+id/reviewButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/review"
-                android:backgroundTint="@color/colorPrimaryDark"
-                android:textColor="#FFFFFF"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:text="@string/review"
+                android:textColor="#FFFFFF"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/reviewStarsPrivacy"/>
+                app:layout_constraintTop_toBottomOf="@+id/reviewStarsPrivacy" />
+
+            <TextView
+                android:id="@+id/cleanliness_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 rating(s)"
+                app:layout_constraintBottom_toBottomOf="@+id/reviewStarsCleanliness"
+                app:layout_constraintStart_toEndOf="@+id/reviewStarsCleanliness" />
+
+            <TextView
+                android:id="@+id/privacy_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 rating(s)"
+                app:layout_constraintBottom_toBottomOf="@+id/reviewStarsPrivacy"
+                app:layout_constraintStart_toEndOf="@+id/reviewStarsPrivacy" />
 
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
-
-
-
 
 
 </android.support.constraint.ConstraintLayout>
