@@ -66,7 +66,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     LatLng currentPosition;
     Marker locationMarker;
     FirebaseFirestore db;
-//    private Map<Marker, String> markerToID = new HashMap<>();
+    //    private Map<Marker, String> markerToID = new HashMap<>();
     FloatingActionButton mArButton;
     boolean isFABOpen = false;
     private ArrayList<Marker> mMarkers = new ArrayList<Marker>();
@@ -82,6 +82,23 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         mArButton = (FloatingActionButton) findViewById(R.id.open_ar_button);
 //        maybeEnableArButton();
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if(location != null){
+                    locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current location").visible(false));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(locationMarker.getPosition()));
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                }
+                else{
+                    locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Current location").visible(false));
+                }
+            }
+
+        });
         setContentView(R.layout.activity_main_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
