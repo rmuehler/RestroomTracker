@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -50,6 +51,7 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -454,7 +456,17 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
     }
 
 
-
-
-
+    @Override
+    protected void onResume() { //clear the image cache whenever the map is resumed
+        super.onResume();
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        if (storageDir.isDirectory())
+        {
+            String[] children = storageDir.list();
+            for (int i = 0; i < children.length; i++)
+            {
+                new File(storageDir, children[i]).delete();
+            }
+        }
+    }
 }
