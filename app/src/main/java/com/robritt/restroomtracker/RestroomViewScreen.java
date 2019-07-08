@@ -48,6 +48,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -408,6 +409,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
     public void openReportScreen(View view) {
         Intent intent = new Intent(this, RestroomReportingScreen.class);
+        intent.putExtra("uid", getIntent().getStringExtra("uid"));
         intent.putExtra("id", getIntent().getStringExtra("id"));
         startActivity(intent);
     }

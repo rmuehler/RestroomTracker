@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.GeoPoint;
@@ -24,7 +25,7 @@ public class RestroomReportingScreen extends AppCompatActivity {
 
     FirebaseFirestore db;
 
-    Map<String, String> document = null;
+    Map<String, Object> document = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +35,21 @@ public class RestroomReportingScreen extends AppCompatActivity {
 
         EditText reportEditText = (EditText) findViewById(R.id.reportDescription);
         Button reportRestroom = findViewById(R.id.button_report);
+
+//        document = (Map<String, Object>) getIntent().getSerializableExtra("data");
+
+        DocumentReference restRef = db.collection("restrooms").document(getIntent().getStringExtra("id")); //trying to find the current username of the creator of restroom
+        restRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                    if (task.isSuccessful()) {
+                                                        document = task.getResult().getData();
+                                                    }
+                                                }
+                                            });
+
+
+
 
         reportRestroom.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,6 +69,10 @@ public class RestroomReportingScreen extends AppCompatActivity {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(RestroomReportingScreen.this, "Report saved", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(RestroomReportingScreen.this, RestroomViewScreen.class);
+                            intent.putExtra("id", getIntent().getStringExtra("id"));
+                            intent.putExtra("uid", getIntent().getStringExtra("uid"));
+                            startActivity(intent);
 
                         }
                     }).addOnFailureListener(new OnFailureListener() {
