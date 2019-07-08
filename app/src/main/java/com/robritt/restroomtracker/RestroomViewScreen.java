@@ -115,7 +115,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
         favoriteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(favorites == null){
+                if(favorites == null || favorites.get(getIntent().getStringExtra("uid")) == null){
                     favorites = new HashMap<>();
                     favorites.put(getIntent().getStringExtra("uid"), true);
                     favoriteButton.setImageResource((android.R.drawable.btn_star_big_on));
@@ -203,7 +203,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
 
                     favorites = (Map<String, Object>) document.get("favorites");
-                    if(favorites == null){
+                    if(favorites == null || favorites.get(getIntent().getStringExtra("uid")) == null){
                         favoriteButton.setImageResource((android.R.drawable.btn_star_big_off));
                     }
                     else if ((boolean)favorites.get(getIntent().getStringExtra("uid")) == true){
