@@ -48,6 +48,7 @@ dependencies {
     implementation 'com.google.ar.sceneform:core:1.10.0'
     implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.10.0'
     implementation 'com.google.maps.android:android-maps-utils:0.5+'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 //    implementation 'com.github.appoly:ARCore-Location:1.2'
 
 }
