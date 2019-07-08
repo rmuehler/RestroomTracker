@@ -69,6 +69,8 @@
 
     <string name="lat">Lat:</string>
     <string name="lng">Long:</string>
+    <string name="sendReport">Send Report</string>
+
 
     <string-array name="numStallsArray">
         <item>Leave Blank</item>

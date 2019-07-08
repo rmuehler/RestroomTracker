@@ -43,14 +43,7 @@ public class RestroomReportingScreen extends AppCompatActivity {
             } //TODO fail conditions
         });
 
-        Button deleteRestroom = findViewById(R.id.button_delete_restroom);
 
-        deleteRestroom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
 
         Button reportRestroom = findViewById(R.id.button_report);
 
