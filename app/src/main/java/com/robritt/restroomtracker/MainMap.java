@@ -248,6 +248,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                                 Intent intent = new Intent(MainMap.this, RestroomViewScreen.class);
 
                                 intent.putExtra("id", restroomID);
+                                intent.putExtra("uid",mAuth.getCurrentUser().getUid());
 //                                intent.putExtra("latitude", geopoint.getLatitude());
 //                                intent.putExtra("longitude", geopoint.getLongitude());
 //                                intent.putExtra("createdby", (String)restroom.get("createdby"));
@@ -353,9 +354,6 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                             }
 
                     }
-
-                    //TODO filter markers based on custom distance filter
-//                     filterRestrooms();
 
                     }
                 });
