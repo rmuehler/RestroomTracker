@@ -34,9 +34,8 @@
         android:layout_marginStart="32dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:onClick="openReportScreen"
-        android:text="@string/favorite"
         android:textColor="#FFFFFF"
+        android:text="@string/favorite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -49,6 +48,7 @@
         android:layout_marginBottom="8dp"
         android:onClick="openReportScreen"
         android:text="@string/title_report"
+        android:backgroundTint="@color/colorPrimaryDark"
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -166,6 +166,22 @@
                 android:text="@string/prompt2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/reviewPrompt" />
+
+            <TextView
+                android:id="@+id/cleanliness_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 rating(s)"
+                app:layout_constraintBottom_toBottomOf="@+id/reviewStarsCleanliness"
+                app:layout_constraintStart_toEndOf="@+id/reviewStarsCleanliness" />
+
+            <TextView
+                android:id="@+id/privacy_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1 rating(s)"
+                app:layout_constraintBottom_toBottomOf="@+id/reviewStarsPrivacy"
+                app:layout_constraintStart_toEndOf="@+id/reviewStarsPrivacy" />
 
             <RatingBar
                 android:id="@+id/reviewStarsCleanliness"
