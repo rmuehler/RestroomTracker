@@ -74,6 +74,8 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
     TextView privacyNo, cleanlinessNo, createdBy, createdAt;
     ImageButton favoriteButton;
 
+    String restroomID;
+
     Map<String, Object> userPrivacyRatings;
     Map<String, Object> userCleanlinessRatings;
     Map<String, Object> favorites;
@@ -88,7 +90,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         db = FirebaseFirestore.getInstance();
         setContentView(R.layout.activity_restroom_view_screen);
-
+        restroomID = getIntent().getStringExtra("id");
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.restroomMapView);
         mapFragment.getMapAsync(this);
@@ -131,7 +133,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
                     favoriteButton.setImageResource((android.R.drawable.btn_star_big_on));
                 }
 
-                db.collection("restrooms").document(getIntent().getStringExtra("id")).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
+                db.collection("restrooms").document(restroomID).set(document).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
 

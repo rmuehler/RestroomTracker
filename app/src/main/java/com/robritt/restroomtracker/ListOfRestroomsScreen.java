@@ -97,6 +97,7 @@ public class ListOfRestroomsScreen extends AppCompatActivity {
                 // Or / And
                 String restroomID = listToID.get(id); //gets restroom DB id from the list ID
                 intent.putExtra("id", restroomID);
+                intent.putExtra("uid", getIntent().getStringExtra("uid"));
 //                Toast.makeText(ListOfRestroomsScreen.this, "ID = " + Long.toString(id) + "RID = " + restroomID, Toast.LENGTH_SHORT).show();
 
                 startActivity(intent);

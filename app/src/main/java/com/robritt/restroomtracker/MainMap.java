@@ -171,6 +171,10 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
     public void openFavScreen(View view) {
         Intent intent = new Intent(this, FavoriteRestroomsScreen.class);
+//        intent.putExtra("map", (Serializable) markerToID);
+        intent.putExtra("uid", mAuth.getCurrentUser().getUid());
+        intent.putExtra("latitude", locationMarker.getPosition().latitude);
+        intent.putExtra("longitude", locationMarker.getPosition().longitude);
         startActivity(intent);
     }
 
@@ -355,8 +359,7 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
                                 Marker marker = mMap.addMarker(new MarkerOptions().position(restroomLocation).title(doc.getString("name"))
                                         .snippet((String) doc.getString("directions"))
                                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN))); //TODO we can have a custom restroom icon here
-
-                                marker.setTag(doc.getId());
+                            marker.setTag(doc.getId());
                                 mMarkers.add(marker);
                             }
 

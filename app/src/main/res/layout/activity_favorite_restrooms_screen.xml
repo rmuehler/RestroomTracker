@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FavoriteRestroomsScreen">
-
+    tools:context=".ListOfRestroomsScreen">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/my_toolbar"
+        android:id="@+id/my_toolbar_favorites"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimaryDark"
@@ -16,17 +15,50 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:title="@string/title_fav"
+        app:title="@string/title_list"
         app:titleTextColor="#FFFFFF" />
 
+
+    <RadioGroup
+        android:id="@+id/rgNumResults_fav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/my_toolbar_favorites">
+
+        <RadioButton
+            android:id="@+id/nearest5_fav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:text="@string/display5" />
+
+        <RadioButton
+            android:id="@+id/nearest15_fav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/display15" />
+
+        <RadioButton
+            android:id="@+id/nearest25_fav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/display25" />
+    </RadioGroup>
+
     <ListView
-        android:id="@+id/list_favorites"
-        android:layout_width="395dp"
-        android:layout_height="627dp"
+        android:id="@+id/list_nearby_fav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
-
+        app:layout_constraintTop_toBottomOf="@+id/rgNumResults_fav" />
 
 </android.support.constraint.ConstraintLayout>
