@@ -26,7 +26,7 @@
     <string name="add">ADD</string>
     <string name="delete_button_text">Delete Account</string>
     <string name="email_placeholder">example@example.com</string>
-    <string name="account_textview_text">ACCOUNT:</string>
+    <string name="account_textview_text">Email:</string>
     <string name="menu">MENU</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -65,6 +65,8 @@
     <string name="display5">Display 5</string>
     <string name="display15">Display 15</string>
     <string name="display25">Display 25</string>
+    <string name="text_username">Username:</string>
+    <string name="username_default">Guest</string>
 
 
     <string name="lat">Lat:</string>

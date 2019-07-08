@@ -33,7 +33,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.ar.core.ArCoreApk;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -416,26 +415,26 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
-    void maybeEnableArButton() {
-        ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(this);
-        if (availability.isTransient()) {
-            // Re-query at 5Hz while compatibility is checked in the background.
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    maybeEnableArButton();
-                }
-            }, 200);
-        }
-        if (availability.isSupported()) {
-//            mArButton.setVisibility(View.VISIBLE);
-            mArButton.setEnabled(false);
-            // indicator on the button.
-        } else { // Unsupported or unknown.
-//            mArButton.setVisibility(View.INVISIBLE);
-            mArButton.setEnabled(false);
-        }
-    }
+//    void maybeEnableArButton() {
+//        ArCoreApk.Availability availability = ArCoreApk.getInstance().checkAvailability(this);
+//        if (availability.isTransient()) {
+//            // Re-query at 5Hz while compatibility is checked in the background.
+//            new Handler().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    maybeEnableArButton();
+//                }
+//            }, 200);
+//        }
+//        if (availability.isSupported()) {
+////            mArButton.setVisibility(View.VISIBLE);
+//            mArButton.setEnabled(false);
+//            // indicator on the button.
+//        } else { // Unsupported or unknown.
+////            mArButton.setVisibility(View.INVISIBLE);
+//            mArButton.setEnabled(false);
+//        }
+//    }
 
     public void filterRestrooms(){
 

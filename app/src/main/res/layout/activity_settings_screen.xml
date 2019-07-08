@@ -6,60 +6,87 @@
     android:layout_height="match_parent"
     tools:context=".SettingsScreen">
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="114dp"
-        android:layout_height="31dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginTop="32dp"
-        android:text="@string/title_settings"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.115"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <Button
         android:id="@+id/sign_off_button"
-        android:layout_width="139dp"
-        android:layout_height="84dp"
-        android:layout_marginStart="136dp"
-        android:layout_marginTop="212dp"
-        android:onClick="signOut"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
         android:text="@string/sign_off_button_text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/delete_account_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/delete_account_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="136dp"
-        android:layout_marginTop="32dp"
-        android:onClick="deleteAccount"
+        android:layout_marginBottom="30dp"
         android:text="@string/delete_button_text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_off_button" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/sign_off_button" />
 
     <TextView
         android:id="@+id/setttings_email_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="106dp"
+        android:layout_marginStart="50dp"
         android:text="@string/email_placeholder"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/account_textview"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/account_textview" />
 
     <TextView
         android:id="@+id/account_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="105dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
         android:text="@string/account_textview_text"
-        app:layout_constraintEnd_toStartOf="@+id/setttings_email_view"
-        app:layout_constraintHorizontal_bias="0.58"
+        android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/title_settings"
+        app:titleTextColor="@android:color/white"
+        tools:layout_editor_absoluteX="8dp" />
+
+    <TextView
+        android:id="@+id/text_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="@string/text_username"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/account_textview"
+        app:layout_constraintTop_toBottomOf="@+id/account_textview" />
+
+    <TextView
+        android:id="@+id/text_usernamedisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/username_default"
+        app:layout_constraintStart_toStartOf="@+id/setttings_email_view"
+        app:layout_constraintTop_toTopOf="@+id/text_username" />
+
+    <ImageButton
+        android:id="@+id/button_editusername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:background="@null"
+        app:layout_constraintStart_toEndOf="@+id/text_usernamedisplay"
+        app:layout_constraintTop_toTopOf="@+id/text_usernamedisplay"
+        app:srcCompat="@android:drawable/ic_menu_edit" />
 </android.support.constraint.ConstraintLayout>

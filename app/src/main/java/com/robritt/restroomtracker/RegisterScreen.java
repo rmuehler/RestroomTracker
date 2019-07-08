@@ -71,20 +71,20 @@ public class RegisterScreen extends AppCompatActivity {
             Toast.makeText(RegisterScreen.this, "Password fields do not match.", Toast.LENGTH_LONG).show();
         }else {
             Query query = userDB.collection("users").whereEqualTo("username", username);
-            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if(task.isSuccessful()){
-                        for(DocumentSnapshot documentSnapshot : task.getResult()){
-                            String foundUser = documentSnapshot.getString("username");
+                    query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
+                                for(DocumentSnapshot documentSnapshot : task.getResult()){
+                                    String foundUser = documentSnapshot.getString("username");
 
-                            if (foundUser.equals(username)){
-                                Log.d("ACCOUNT", "User Exists");
-                                Toast.makeText(RegisterScreen.this, "Username already exists.", Toast.LENGTH_SHORT).show();
+                                    if (foundUser.equals(username)){
+                                        Log.d("ACCOUNT", "User Exists");
+                                        Toast.makeText(RegisterScreen.this, "Username already exists.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
                             }
-                        }
-
-                    }
 
                     if (task.getResult().size() == 0){
                         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {

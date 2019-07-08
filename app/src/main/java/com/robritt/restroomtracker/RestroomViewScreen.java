@@ -293,46 +293,57 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
                     String dbGender = (String) document.get("gender");
 
-                    if (dbGender.equals("Family")) {
-                        genderTextView.setText("Family Restroom");
-                    } else if (dbGender.equals("Men")) {
-                        genderTextView.setText("Men's Room");
+                    if(dbGender != null) {
+                        if (dbGender.equals("Family")) {
+                            genderTextView.setText("Family Restroom");
+                        } else if (dbGender.equals("Men")) {
+                            genderTextView.setText("Men's Room");
 
-                    } else if (dbGender.equals("Women")) {
-                        genderTextView.setText("Women's Room");
+                        } else if (dbGender.equals("Women")) {
+                            genderTextView.setText("Women's Room");
 
-                    } else {
-                        genderTextView.setText("Unisex Restroom");
+                        } else {
+                            genderTextView.setText("Unisex Restroom");
+                        }
                     }
 
                     String dbAutomatic = (String) document.get("automatictoilets");
-                    if (dbAutomatic.equals("Yes")) {
-                        listItems.add("Automatic Toilets");
-                        adapter.notifyDataSetChanged();
-                    } else if (dbAutomatic.equals("No")) {
-                        listItems.add("No Automatic Toilets");
-                        adapter.notifyDataSetChanged();
+                    if (dbAutomatic != null) {
+                        if (dbAutomatic.equals("Yes")) {
+                            listItems.add("Automatic Toilets");
+                            adapter.notifyDataSetChanged();
+                        } else if (dbAutomatic.equals("No")) {
+                            listItems.add("No Automatic Toilets");
+                            adapter.notifyDataSetChanged();
+                        }
                     }
 
                     String dbInside = (String) document.get("insidebuilding");
-                    if (dbInside.equals("Yes")) {
-                        listItems.add("Inside Building");
-                        adapter.notifyDataSetChanged();
-                    } else if (dbInside.equals("No")) {
-                        listItems.add("Accessible from Outside Building");
-                        adapter.notifyDataSetChanged();
+                    if (dbInside != null) {
+                        if (dbInside.equals("Yes")) {
+                            listItems.add("Inside Building");
+                            adapter.notifyDataSetChanged();
+                        } else if (dbInside.equals("No")) {
+                            listItems.add("Accessible from Outside Building");
+                            adapter.notifyDataSetChanged();
+                        }
                     }
 
                     String dbDirections = (String) document.get("directions");
-                    if (!dbDirections.equals("")) {
-                        listItems.add("Directions: " + dbDirections);
-                        adapter.notifyDataSetChanged();
+                    if(dbDirections != null) {
+                        if (!dbDirections.equals("")) {
+                            listItems.add("Directions: " + dbDirections);
+                            adapter.notifyDataSetChanged();
+                        }
                     }
 
+
                     String dbStalls = (String) document.get("stalls");
-                    if (!dbStalls.equals("Leave Blank")) {
-                        listItems.add("Number of Stalls: " + dbStalls);
-                        adapter.notifyDataSetChanged();
+                    if (dbStalls != null) {
+                        if (!dbStalls.equals("Leave Blank")) {
+                            listItems.add("Number of Stalls: " + dbStalls);
+                            adapter.notifyDataSetChanged();
+                        }
                     }
 
                     userCleanlinessRatings = (Map<String, Object>) document.get("cleanliness");
