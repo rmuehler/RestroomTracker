@@ -81,32 +81,13 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         filters = getSharedPreferences("filters", MODE_PRIVATE);
         mArButton = (FloatingActionButton) findViewById(R.id.open_ar_button);
 //        maybeEnableArButton();
+        locationMarker = null;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-        }
-        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if(location != null){
-                    locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current location").visible(false));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(locationMarker.getPosition()));
-                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
-                }
-                else{
-                    locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("Current location").visible(false));
-                }
-            }
-
-        });
         setContentView(R.layout.activity_main_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
-//        instance = this;
-
         locationCallback = new LocationCallback() {
             @Override
             public void onLocationResult(LocationResult locationResult) {
@@ -214,10 +195,9 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
         mMap = googleMap;
-        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         Dexter.withActivity(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
             @Override
             public void onPermissionGranted(PermissionGrantedResponse response) {
@@ -241,8 +221,23 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         }).check();
 
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        }
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() { //get last location
+            @Override
+            public void onSuccess(Location location) {
+                if(location != null){
+                    locationMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).title("Current location").visible(false));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(locationMarker.getPosition()));
+                    mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                    updateRestroomLocations();
+                }
+                else{
 
-//        Location myLocation = mMap.getMyLocation();
+                }
+            }
+
+        });
 
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -282,12 +277,10 @@ public class MainMap extends FragmentActivity implements OnMapReadyCallback {
         });
 
 
-
-
-
-
-//        updateLastLocation();
-        updateRestroomLocations();
+//        while(locationMarker == null){
+//            Toast.makeText(MainMap.this, "WTF" , Toast.LENGTH_SHORT).show();
+//        }
+         //this should be the last thing we do
 
 
 
