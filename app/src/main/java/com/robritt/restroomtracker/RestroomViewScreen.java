@@ -123,6 +123,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
                 if(favorites == null || favorites.get(getIntent().getStringExtra("uid")) == null){
                     favorites = new HashMap<>();
                     favorites.put(getIntent().getStringExtra("uid"), true);
+                    document.put("favorites", favorites);
                     favoriteButton.setImageResource((android.R.drawable.btn_star_big_on));
                 }
                 else if ((boolean)favorites.get(getIntent().getStringExtra("uid")) == true){
