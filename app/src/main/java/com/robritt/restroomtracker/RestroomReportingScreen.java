@@ -26,6 +26,7 @@ public class RestroomReportingScreen extends AppCompatActivity {
     FirebaseFirestore db;
 
     Map<String, Object> document = null;
+    EditText reportEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class RestroomReportingScreen extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         setContentView(R.layout.activity_restroom_reporting_screen);
 
-        EditText reportEditText = (EditText) findViewById(R.id.reportDescription);
+        reportEditText = (EditText) findViewById(R.id.reportDescription);
         Button reportRestroom = findViewById(R.id.button_report);
 
 //        document = (Map<String, Object>) getIntent().getSerializableExtra("data");

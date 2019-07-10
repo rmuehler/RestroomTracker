@@ -77,6 +77,8 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
 
     String restroomID;
 
+    ImageView showPhoto;
+
     Map<String, Object> userPrivacyRatings;
     Map<String, Object> userCleanlinessRatings;
     Map<String, Object> favorites;
@@ -362,7 +364,7 @@ public class RestroomViewScreen extends AppCompatActivity implements OnMapReadyC
                     cleanlinessNo.setText(userCleanlinessRatings.size() + " rating(s)");
 
                     String dbImage = (String) document.get("image");
-                    ImageView showPhoto = (ImageView) findViewById(R.id.imgView);
+                    showPhoto = (ImageView) findViewById(R.id.imgView);
 
                     setListViewHeightBasedOnChildren(listView);
 

@@ -108,7 +108,7 @@ public class SettingsScreen extends AppCompatActivity {
                         .setPositiveButton("Done", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String newUsername = newUsernamePrompt.getText().toString();
+                                final String newUsername = newUsernamePrompt.getText().toString();
 
                                 Query query = db.collection("users").whereEqualTo("username", newUsername);
                                 Boolean userNameFound = false;
