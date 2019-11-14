@@ -1,7 +1,2 @@
 # RestroomTracker
-Restroom Tracker for Software Development Movile Devices, USF
-
-
-##TODO
-
-Vertical Prototype
+Restroom Tracker for Software Development Movile Devices, USF Summer 2019
